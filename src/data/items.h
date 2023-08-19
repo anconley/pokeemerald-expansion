@@ -10356,4 +10356,102 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .flingPower = 10,
     },
+
+    [ITEM_TRAINER_CARD] =
+    {
+        .name = _("Trainer Card"),
+        .itemId = ITEM_TRAINER_CARD,
+        .price = 0,
+        .holdEffectParam = 6,
+        .description = sTrainerCard,
+        .importance = 1,
+        .registrability = TRUE,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
+    },
+
+    [ITEM_POKEHEAL] =
+    {
+        .name = _("PokéHeal"),
+        .itemId = ITEM_POKEHEAL,
+        .price = 0,
+        .holdEffectParam = 6,
+        .description = sTrainerCard,
+        .importance = 1,
+        .registrability = TRUE,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
+    },
+
+    [ITEM_POKEPOISON] =
+    {
+        .name = _("PokéPoison"),
+        .itemId = ITEM_POKEPOISON,
+        .price = 0,
+        .holdEffectParam = 6,
+        .description = sTrainerCard,
+        .importance = 1,
+        .registrability = TRUE,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
+    },
+
+    [ITEM_POKEBURN] =
+    {
+        .name = _("PokéBurn"),
+        .itemId = ITEM_POKEBURN,
+        .price = 0,
+        .holdEffectParam = 6,
+        .description = sTrainerCard,
+        .importance = 1,
+        .registrability = TRUE,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
+    },
+
+    [ITEM_POKESLEEP] =
+    {
+        .name = _("PokéSleep"),
+        .itemId = ITEM_POKESLEEP,
+        .price = 0,
+        .holdEffectParam = 6,
+        .description = sTrainerCard,
+        .importance = 1,
+        .registrability = TRUE,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
+    },
+
+    [ITEM_POKEPARA] =
+    {
+        .name = _("PokéPara"),
+        .itemId = ITEM_POKEPARA,
+        .price = 0,
+        .holdEffectParam = 6,
+        .description = sTrainerCard,
+        .importance = 1,
+        .registrability = TRUE,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
+    },
+
+    [ITEM_POKEFREEZE] =
+    {
+        .name = _("PokéFreeze"),
+        .itemId = ITEM_POKEFREEZE,
+        .price = 0,
+        .holdEffectParam = 6,
+        .description = sTrainerCard,
+        .importance = 1,
+        .registrability = TRUE,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
+    }
 };

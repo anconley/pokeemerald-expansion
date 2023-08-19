@@ -5280,6 +5280,12 @@ static void DisplayExpPoints(u8 taskId, TaskFunc task, u8 holdEffectParam)
     gTasks[taskId].func = task;
 }
 
+bool8 CheckTrainerCardLevelUp(u8 initialLevel)
+{
+    u8 levelCap = GetLevelCap();
+    return (initialLevel < levelCap);
+}
+
 void ItemUseCB_RareCandy(u8 taskId, TaskFunc task)
 {
     struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
@@ -5287,10 +5293,18 @@ void ItemUseCB_RareCandy(u8 taskId, TaskFunc task)
     s16 *arrayPtr = ptr->data;
     u16 *itemPtr = &gSpecialVar_ItemId;
     bool8 cannotUseEffect;
+    bool8 cardCheck;
     u8 holdEffectParam = ItemId_GetHoldEffectParam(*itemPtr);
 
     sInitialLevel = GetMonData(mon, MON_DATA_LEVEL);
-    if (sInitialLevel != MAX_LEVEL)
+
+    // check if trainer card should do a level up
+    cardCheck = TRUE;
+    if (holdEffectParam == 6) {
+        cardCheck = CheckTrainerCardLevelUp(sInitialLevel);
+    }
+
+    if (sInitialLevel != MAX_LEVEL && cardCheck)
     {
         BufferMonStatsToTaskData(mon, arrayPtr);
         cannotUseEffect = ExecuteTableBasedItemEffect(mon, *itemPtr, gPartyMenu.slotId, 0);

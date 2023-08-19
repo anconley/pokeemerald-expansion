@@ -844,6 +844,14 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     [ITEM_LINKING_CORD] = {gItemIcon_LinkingCord, gItemIconPalette_LinkingCord},
     [ITEM_PEAT_BLOCK] = {gItemIcon_PeatBlock, gItemIconPalette_PeatBlock},
     [ITEM_BERSERK_GENE] = {gItemIcon_BerserkGene, gItemIconPalette_BerserkGene},
+    // Custom
+    [ITEM_TRAINER_CARD] = {gItemIcon_CardKey, gItemIconPalette_CardKey},
+    [ITEM_POKEHEAL] = {gItemIcon_BattleStatItem, gItemIconPalette_GuardSpec},
+    [ITEM_POKEPOISON] = {gItemIcon_BattleStatItem, gItemIconPalette_XDefend},
+    [ITEM_POKEBURN] = {gItemIcon_BattleStatItem, gItemIconPalette_XAttack},
+    [ITEM_POKESLEEP] = {gItemIcon_BattleStatItem, gItemIconPalette_XSpeed},
+    [ITEM_POKEPARA] = {gItemIcon_BattleStatItem, gItemIconPalette_DireHit},
+    [ITEM_POKEFREEZE] = {gItemIcon_BattleStatItem, gItemIconPalette_XAccuracy},
     // Return to field arrow
     [ITEMS_COUNT] = {gItemIcon_ReturnToFieldArrow, gItemIconPalette_ReturnToFieldArrow},
 };
