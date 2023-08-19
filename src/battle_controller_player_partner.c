@@ -1567,7 +1567,7 @@ static void PlayerPartnerHandleChoosePokemon(void)
             u8 playerMonIdentity = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
             u8 selfIdentity = GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT);
 
-            for (chosenMonId = PARTY_SIZE / 2; chosenMonId < PARTY_SIZE; chosenMonId++)
+            for (chosenMonId = MULTI_PARTY_SIZE; chosenMonId < PARTY_SIZE; chosenMonId++)
             {
                 if (GetMonData(&gPlayerParty[chosenMonId], MON_DATA_HP) != 0
                     && chosenMonId != gBattlerPartyIndexes[playerMonIdentity]

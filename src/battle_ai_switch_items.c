@@ -920,8 +920,8 @@ u8 GetMostSuitableMonToSwitchInto(void)
     s32 i, j, aliveCount = 0;
     u32 invalidMons = 0, aceMonId = PARTY_SIZE;
 
-    if (*(gBattleStruct->monToSwitchIntoId + gActiveBattler) != PARTY_SIZE)
-        return *(gBattleStruct->monToSwitchIntoId + gActiveBattler);
+    /* (*(gBattleStruct->monToSwitchIntoId + gActiveBattler) != PARTY_SIZE)
+        return *(gBattleStruct->monToSwitchIntoId + gActiveBattler); */ // Commented out since new party size makes the Struct carry junk data.
     if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
         return gBattlerPartyIndexes[gActiveBattler] + 1;
 

@@ -154,13 +154,13 @@ static void InitSinglePlayerBtlControllers(void)
         gBattlerPartyIndexes[1] = 0;
         if (BATTLE_TWO_VS_ONE_OPPONENT)
         {
-            gBattlerPartyIndexes[2] = 3;
+            gBattlerPartyIndexes[2] = MULTI_PARTY_SIZE;
             gBattlerPartyIndexes[3] = 1;
         }
         else
         {
-            gBattlerPartyIndexes[2] = 3;
-            gBattlerPartyIndexes[3] = 3;
+            gBattlerPartyIndexes[2] = MULTI_PARTY_SIZE; // Changed so that partner sends its first mon and not player's last
+            gBattlerPartyIndexes[3] = MULTI_PARTY_SIZE;
         }
     }
     else if (!(gBattleTypeFlags & BATTLE_TYPE_DOUBLE))
@@ -263,8 +263,8 @@ static void InitSinglePlayerBtlControllers(void)
 
                 gBattlerPartyIndexes[0] = 0;
                 gBattlerPartyIndexes[1] = 0;
-                gBattlerPartyIndexes[2] = 3;
-                gBattlerPartyIndexes[3] = 3;
+                gBattlerPartyIndexes[2] = MULTI_PARTY_SIZE; // Changed so that partner sends its first mon and not player's last
+                gBattlerPartyIndexes[3] = MULTI_PARTY_SIZE;
             }
             else if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
             {
@@ -1194,9 +1194,9 @@ void BtlController_EmitChoosePokemon(u8 bufferId, u8 caseId, u8 slotId, u16 abil
     sBattleBuffersTransferData[2] = slotId;
     sBattleBuffersTransferData[3] = abilityId & 0xFF;
     sBattleBuffersTransferData[7] = (abilityId >> 8) & 0xFF;
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < PARTY_SIZE/2; i++)
         sBattleBuffersTransferData[4 + i] = data[i];
-    PrepareBufferDataTransfer(bufferId, sBattleBuffersTransferData, 8);  // Only 7 bytes were written.
+    PrepareBufferDataTransfer(bufferId, sBattleBuffersTransferData, 8);  // Only 7 bytes were written. Now that should be 8 due to new byte from party expansion
 }
 
 // Unused
@@ -1341,7 +1341,7 @@ void BtlController_EmitChosenMonReturnValue(u8 bufferId, u8 partyId, u8 *battleP
     sBattleBuffersTransferData[1] = partyId;
     for (i = 0; i < (int)ARRAY_COUNT(gBattlePartyCurrentOrder); i++)
         sBattleBuffersTransferData[2 + i] = battlePartyOrder[i];
-    PrepareBufferDataTransfer(bufferId, sBattleBuffersTransferData, 5);
+    PrepareBufferDataTransfer(bufferId, sBattleBuffersTransferData, 6); // +1 extra byte due to expanded party size.
 }
 
 void BtlController_EmitOneReturnValue(u8 bufferId, u16 ret)

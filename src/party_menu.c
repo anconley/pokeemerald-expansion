@@ -189,7 +189,7 @@ struct PartyMenuInternal
     TaskFunc task;
     MainCallback exitCallback;
     u32 chooseHalf:1;
-    u32 lastSelectedSlot:3;  // Used to return to same slot when going left/right bewtween columns
+    u32 lastSelectedSlot:(PARTY_SIZE/2);  // Used to return to same slot when going left/right bewtween columns
     u32 spriteIdConfirmPokeball:7;
     u32 spriteIdCancelPokeball:7;
     u32 messageId:14;
@@ -807,6 +807,11 @@ static void InitPartyMenuBoxes(u8 layout)
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
+        // Even indexes (0, 2, 4 etc) go on left column, odd indexes (1, 3, 5, 7) go on right
+        if (i%2==0)
+            sPartyMenuBoxes[i].infoRects = &sPartyBoxInfoRects[PARTY_BOX_LEFT_COLUMN];
+        else
+            sPartyMenuBoxes[i].infoRects = &sPartyBoxInfoRects[PARTY_BOX_RIGHT_COLUMN];
         sPartyMenuBoxes[i].infoRects = &sPartyBoxInfoRects[PARTY_BOX_RIGHT_COLUMN];
         sPartyMenuBoxes[i].spriteCoords = sPartyMenuSpriteCoords[layout][i];
         sPartyMenuBoxes[i].windowId = i;
@@ -815,13 +820,13 @@ static void InitPartyMenuBoxes(u8 layout)
         sPartyMenuBoxes[i].pokeballSpriteId = SPRITE_NONE;
         sPartyMenuBoxes[i].statusSpriteId = SPRITE_NONE;
     }
-    // The first party mon goes in the left column
-    sPartyMenuBoxes[0].infoRects = &sPartyBoxInfoRects[PARTY_BOX_LEFT_COLUMN];
+    // The first party mon usually goes in the left column, but not anymore on the new layout so this is uneeded logic
+    /*sPartyMenuBoxes[0].infoRects = &sPartyBoxInfoRects[PARTY_BOX_LEFT_COLUMN];
 
     if (layout == PARTY_LAYOUT_MULTI_SHOWCASE)
         sPartyMenuBoxes[3].infoRects = &sPartyBoxInfoRects[PARTY_BOX_LEFT_COLUMN];
     else if (layout != PARTY_LAYOUT_SINGLE)
-        sPartyMenuBoxes[1].infoRects = &sPartyBoxInfoRects[PARTY_BOX_LEFT_COLUMN];
+        sPartyMenuBoxes[1].infoRects = &sPartyBoxInfoRects[PARTY_BOX_LEFT_COLUMN];*/
 }
 
 static void RenderPartyMenuBox(u8 slot)
@@ -2165,31 +2170,31 @@ static void BlitBitmapToPartyWindow_LeftColumn(u8 windowId, u8 x, u8 y, u8 width
 {
     if (width == 0 && height == 0)
     {
-        width = 10;
-        height = 7;
+        width = 14;
+        height = 4;
     }
     if (hideHP == FALSE)
-        BlitBitmapToPartyWindow(windowId, sSlotTilemap_Main, 10, x, y, width, height);
+        BlitBitmapToPartyWindow(windowId, sSlotTilemap_Main, 14, x, y, width, height);
     else
-        BlitBitmapToPartyWindow(windowId, sSlotTilemap_MainNoHP, 10, x, y, width, height);
+        BlitBitmapToPartyWindow(windowId, sSlotTilemap_MainNoHP, 14, x, y, width, height);
 }
 
 static void BlitBitmapToPartyWindow_RightColumn(u8 windowId, u8 x, u8 y, u8 width, u8 height, bool8 hideHP)
 {
     if (width == 0 && height == 0)
     {
-        width = 18;
-        height = 3;
+        width = 14;
+        height = 4;
     }
     if (hideHP == FALSE)
-        BlitBitmapToPartyWindow(windowId, sSlotTilemap_Wide, 18, x, y, width, height);
+        BlitBitmapToPartyWindow(windowId, sSlotTilemap_Wide, 14, x, y, width, height);
     else
-        BlitBitmapToPartyWindow(windowId, sSlotTilemap_WideNoHP, 18, x, y, width, height);
+        BlitBitmapToPartyWindow(windowId, sSlotTilemap_WideNoHP, 14, x, y, width, height);
 }
 
 static void DrawEmptySlot(u8 windowId)
 {
-    BlitBitmapToPartyWindow(windowId, sSlotTilemap_WideEmpty, 18, 0, 0, 18, 3);
+    BlitBitmapToPartyWindow(windowId, sSlotTilemap_WideEmpty, 14, 0, 0, 14, 4);
 }
 
 #define LOAD_PARTY_BOX_PAL(paletteIds, paletteOffsets)                                                    \
@@ -2853,7 +2858,7 @@ static void SwitchSelectedMons(u8 taskId)
         tSlot1Width = GetWindowAttribute(windowIds[0], WINDOW_WIDTH);
         tSlot1Height = GetWindowAttribute(windowIds[0], WINDOW_HEIGHT);
         tSlot1Offset = 0;
-        if (tSlot1Width == 10)
+        if (tSlot1Left == 1)
             tSlot1SlideDir = -1;
         else
             tSlot1SlideDir = 1;
@@ -2863,7 +2868,7 @@ static void SwitchSelectedMons(u8 taskId)
         tSlot2Width = GetWindowAttribute(windowIds[1], WINDOW_WIDTH);
         tSlot2Height = GetWindowAttribute(windowIds[1], WINDOW_HEIGHT);
         tSlot2Offset = 0;
-        if (tSlot2Width == 10)
+        if (tSlot2Left == 1)
             tSlot2SlideDir = -1;
         else
             tSlot2SlideDir = 1;
@@ -6364,8 +6369,8 @@ static bool8 TrySwitchInPokemon(void)
     u8 newSlot;
     u8 i;
 
-    // In a multi battle, slots 1, 4, and 5 are the partner's pokemon
-    if (IsMultiBattle() == TRUE && (slot == 1 || slot == 4 || slot == 5))
+    // In a multi battle, slots 1, 4, and 5 are the partner's pokemon // Now these are 1 5 6 & 7!
+    if (IsMultiBattle() == TRUE && (slot == 1 || slot == 5 || slot == 6 || slot == 7))
     {
         StringCopy(gStringVar1, GetTrainerPartnerName());
         StringExpandPlaceholders(gStringVar4, gText_CantSwitchWithAlly);
@@ -6431,17 +6436,22 @@ static void BufferBattlePartyOrder(u8 *partyBattleOrder, u8 flankId)
     {
         // Party ids are packed in 4 bits at a time
         // i.e. the party id order below would be 0, 3, 5, 4, 2, 1, and the two parties would be 0,5,4 and 3,2,1
-        if (flankId != 0)
+        if (flankId != 0) // partner pov
         {
-            partyBattleOrder[0] = 0 | (3 << 4);
-            partyBattleOrder[1] = 5 | (4 << 4);
-            partyBattleOrder[2] = 2 | (1 << 4);
+            // Each position holds two pokemon. In this case, first position holds mons 4 and 0 (binary 0100-0000)
+            partyBattleOrder[0] = 0 | (4 << 4); 
+            partyBattleOrder[1] = 6 | (5 << 4); 
+            partyBattleOrder[2] = 1 | (7 << 4); 
+            //Added line to account for expanded party size of 8
+            partyBattleOrder[3] = 3 | (2 << 4); 
         }
-        else
+        else // Player pov
         {
-            partyBattleOrder[0] = 3 | (0 << 4);
-            partyBattleOrder[1] = 2 | (1 << 4);
-            partyBattleOrder[2] = 5 | (4 << 4);
+            partyBattleOrder[0] = 4 | (0 << 4); 
+            partyBattleOrder[1] = 2 | (1 << 4); 
+            partyBattleOrder[2] = 5 | (3 << 4); 
+            //Added line to account for expanded party size of 8
+            partyBattleOrder[3] = 7 | (6 << 4);
         }
         return;
     }
@@ -6502,17 +6512,21 @@ static void BufferBattlePartyOrderBySide(u8 *partyBattleOrder, u8 flankId, u8 ba
 
     if (IsMultiBattle() == TRUE)
     {
-        if (flankId != 0)
+        if (flankId != 0) // non player
         {
-            partyBattleOrder[0] = 0 | (3 << 4);
-            partyBattleOrder[1] = 5 | (4 << 4);
-            partyBattleOrder[2] = 2 | (1 << 4);
+            partyBattleOrder[0] = 0 | (4 << 4); // 0100-0000
+            partyBattleOrder[1] = 6 | (5 << 4); // 0101-0110
+            partyBattleOrder[2] = 1 | (7 << 4); // 0111-0001
+            //Added line to account for expanded party size of 8
+            partyBattleOrder[3] = 3 | (2 << 4); // 0010-0011
         }
-        else
+        else // player
         {
-            partyBattleOrder[0] = 3 | (0 << 4);
-            partyBattleOrder[1] = 2 | (1 << 4);
-            partyBattleOrder[2] = 5 | (4 << 4);
+            partyBattleOrder[0] = 4 | (0 << 4); // 0000-0100
+            partyBattleOrder[1] = 2 | (1 << 4); // 0001-0010
+            partyBattleOrder[2] = 5 | (3 << 4); // 0011-0101
+            //Added line to account for expanded party size of 8
+            partyBattleOrder[3] = 7 | (6 << 4); // 0110-0111
         }
         return;
     }
@@ -6544,7 +6558,7 @@ static void BufferBattlePartyOrderBySide(u8 *partyBattleOrder, u8 flankId, u8 ba
         }
     }
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < PARTY_SIZE/2; i++)
         partyBattleOrder[i] = (partyIndexes[0 + (i * 2)] << 4) | partyIndexes[1 + (i * 2)];
 }
 
@@ -6559,7 +6573,7 @@ void SwitchPartyOrderLinkMulti(u8 battlerId, u8 slot, u8 slot2)
     if (IsMultiBattle())
     {
         partyBattleOrder = gBattleStruct->battlerPartyOrders[battlerId];
-        for (i = j = 0; i < PARTY_SIZE / 2; j++, i++)
+        for (i = j = 0; i < MULTI_PARTY_SIZE; j++, i++)
         {
             partyIds[j] = partyBattleOrder[i] >> 4;
             j++;
@@ -6581,6 +6595,7 @@ void SwitchPartyOrderLinkMulti(u8 battlerId, u8 slot, u8 slot2)
             partyBattleOrder[0] = (partyIds[0] << 4) | partyIds[1];
             partyBattleOrder[1] = (partyIds[2] << 4) | partyIds[3];
             partyBattleOrder[2] = (partyIds[4] << 4) | partyIds[5];
+            partyBattleOrder[3] = (partyIds[6] << 4) | partyIds[7];
         }
     }
 }
