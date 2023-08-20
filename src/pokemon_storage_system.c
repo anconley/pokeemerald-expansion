@@ -4197,11 +4197,25 @@ static void UpdateCloseBoxButtonFlash(void)
 
 static void SetPartySlotTilemaps(void)
 {
-    u8 i;
+    u16 i, j, index;
+    const u16 *data;
+
+    data = sPartySlotEmpty_Tilemap;
+    index = 3 * (3 * 4 + 1);
+    index *= 4;
+    index += 7;
+    index -= 12;
+    for (i = 0; i < 5; i++)
+    {
+        for (j = 0; j < 4; j++)
+            sStorage->partyMenuTilemapBuffer[index + j] = data[6];
+
+        index += 12;
+    }
 
     // Skips first party slot, it should always be drawn
     // as if it has a Pokémon in it
-    for (i = 1; i < PARTY_SIZE; i++)
+    for (i = 0; i < PARTY_SIZE; i++)
     {
         s32 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
         SetPartySlotTilemap(i, species != SPECIES_NONE);
@@ -4211,16 +4225,43 @@ static void SetPartySlotTilemaps(void)
 static void SetPartySlotTilemap(u8 partyId, bool8 hasMon)
 {
     u16 i, j, index;
-    const u16 *data;
+    const u16 *data; 
 
     if (hasMon)
         data = sPartySlotFilled_Tilemap;
     else
         data = sPartySlotEmpty_Tilemap;
 
-    index = 3 * (3 * (partyId - 1) + 1);
+    if (partyId % 2 == 0) {
+        index = 3 * (3 * (partyId / 2) + 1);
+        index *= 4;
+        index += 1;
+        for (i = 0; i < 3; i++)
+        {
+            for (j = 0; j < 4; j++)
+                sStorage->partyMenuTilemapBuffer[index + j] = data[j];
+
+            data += 4;
+            index += 12;
+        }
+    }
+    else {
+        index = 3 * (3 * (partyId / 2) + 1);
+        index *= 4;
+        index += 7;
+        for (i = 0; i < 3; i++)
+        {
+            for (j = 0; j < 4; j++)
+                sStorage->partyMenuTilemapBuffer[index + j] = data[j];
+
+            data += 4;
+            index += 12;
+        }
+    }
+
+    /*index = 3 * (3 * (partyId - 1) + 1);
     index *= 4;
-    index += 7;
+    index += 7; // index is 19 for partyId 1, 55 for partyId 2, 91 for partyId 3, 127 for 4, 163 for 5
     for (i = 0; i < 3; i++)
     {
         for (j = 0; j < 4; j++)
@@ -4228,7 +4269,7 @@ static void SetPartySlotTilemap(u8 partyId, bool8 hasMon)
 
         data += 4;
         index += 12;
-    }
+    }*/
 }
 
 static void UpdatePartySlotColors(void)
@@ -4760,7 +4801,7 @@ static void CreatePartyMonsSprites(bool8 visible)
     u16 species = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG);
     u32 personality = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
 
-    sStorage->partySprites[0] = CreateMonIconSprite(species, personality, 104, 64, 1, 12);
+    sStorage->partySprites[0] = CreateMonIconSprite(species, personality, 104, 16, 1, 12);
     count = 1;
     for (i = 1; i < PARTY_SIZE; i++)
     {
@@ -4768,7 +4809,10 @@ static void CreatePartyMonsSprites(bool8 visible)
         if (species != SPECIES_NONE)
         {
             personality = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
-            sStorage->partySprites[i] = CreateMonIconSprite(species, personality, 152,  8 * (3 * (i - 1)) + 16, 1, 12);
+            if (i % 2 == 1)
+                sStorage->partySprites[i] = CreateMonIconSprite(species, personality, 152,  8 * (3 * (i / 2)) + 16, 1, 12);
+            else
+                sStorage->partySprites[i] = CreateMonIconSprite(species, personality, 104,  8 * (3 * (i / 2)) + 16, 1, 12);
             count++;
         }
         else
@@ -4833,10 +4877,15 @@ static void MovePartySpriteToNextSlot(struct Sprite *sprite, u16 partyId)
     s16 x, y;
 
     sprite->sPartyId = partyId;
-    if (partyId == 0)
-        x = 104, y = 64;
-    else
-        x = 152, y = 8 * (3 * (partyId - 1)) + 16;
+    if (partyId == 0) {
+        x = 104, y = 16;
+    }
+    else {
+        if (partyId % 2 == 1)
+            x = 152, y = 8 * (3 * (partyId / 2)) + 16;
+        else
+            x = 104, y = 8 * (3 * (partyId / 2)) + 16;
+    }
 
     sprite->sMonX = (u16)(sprite->x) * 8;
     sprite->sMonY = (u16)(sprite->y) * 8;
@@ -4861,12 +4910,18 @@ static void SpriteCB_MovePartyMonToNextSlot(struct Sprite *sprite)
         if (sprite->sPartyId == 0)
         {
             sprite->x = 104;
-            sprite->y = 64;
+            sprite->y = 16;
         }
         else
         {
-            sprite->x = 152;
-            sprite->y = 8 * (3 * (sprite->sPartyId - 1)) + 16;
+            if (sprite->sPartyId % 2 == 1) {
+                sprite->x = 152;
+                sprite->y = 8 * (3 * (sprite->sPartyId / 2)) + 16;
+            }  
+            else {
+                sprite->x = 104;
+                sprite->y = 8 * (3 * (sprite->sPartyId / 2)) + 16;
+            }
         }
         sprite->callback = SpriteCallbackDummy;
         sStorage->partySprites[sprite->sPartyId] = sprite;
@@ -5870,7 +5925,7 @@ static void GetCursorCoordsByPos(u8 cursorArea, u8 cursorPosition, u16 *x, u16 *
         if (cursorPosition == 0)
         {
             *x = 104;
-            *y = 52;
+            *y = 4;
         }
         else if (cursorPosition == PARTY_SIZE)
         {
@@ -5879,8 +5934,14 @@ static void GetCursorCoordsByPos(u8 cursorArea, u8 cursorPosition, u16 *x, u16 *
         }
         else
         {
-            *x = 152;
-            *y = (cursorPosition - 1) * 24 + 4;
+            if (cursorPosition % 2 == 1) {
+                *x = 152;
+                *y = 8 * (3 * (cursorPosition / 2)) + 4;
+            }
+            else {
+                *x = 104;
+                *y = 8 * (3 * (cursorPosition / 2)) + 4;
+            }
         }
         break;
     case CURSOR_AREA_BOX_TITLE:
@@ -7377,39 +7438,47 @@ static u8 HandleInput_InParty(void)
 
         if (JOY_REPEAT(DPAD_UP))
         {
-            if (--cursorPosition < 0)
+            if (cursorPosition == 0 || cursorPosition == 1) {
                 cursorPosition = PARTY_SIZE;
+            }
+            else if (cursorPosition == PARTY_SIZE) {
+                cursorPosition--;
+            }
+            else {
+                cursorPosition = cursorPosition - 2;
+            }
             if (cursorPosition != sCursorPosition)
                 retVal = INPUT_MOVE_CURSOR;
             break;
         }
         else if (JOY_REPEAT(DPAD_DOWN))
         {
-            if (++cursorPosition > PARTY_SIZE)
-                cursorPosition = 0;
+            if (cursorPosition == 6 || cursorPosition == 7) {
+                cursorPosition = PARTY_SIZE;
+            }
+            else {
+                cursorPosition = cursorPosition + 2;
+            }
             if (cursorPosition != sCursorPosition)
                 retVal = INPUT_MOVE_CURSOR;
             break;
         }
-        else if (JOY_REPEAT(DPAD_LEFT) && sCursorPosition != 0)
+        else if (JOY_REPEAT(DPAD_LEFT) && (cursorPosition % 2 != 0))
         {
+            cursorPosition--;
             retVal = INPUT_MOVE_CURSOR;
-            sStorage->cursorPrevHorizPos = sCursorPosition;
-            cursorPosition = 0;
             break;
         }
         else if (JOY_REPEAT(DPAD_RIGHT))
         {
-            if (sCursorPosition == 0)
-            {
-                retVal = INPUT_MOVE_CURSOR;
-                cursorPosition = sStorage->cursorPrevHorizPos;
-            }
-            else
-            {
+            if (cursorPosition % 2 == 1 || cursorPosition == PARTY_SIZE) {
                 retVal = INPUT_HIDE_PARTY;
                 cursorArea = CURSOR_AREA_IN_BOX;
                 cursorPosition = 0;
+            }
+            else {
+                retVal = INPUT_MOVE_CURSOR;
+                cursorPosition++;
             }
             break;
         }

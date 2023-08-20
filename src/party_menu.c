@@ -1553,7 +1553,7 @@ static void UpdatePartySelectionSingleLayout(s8 *slotPtr, s8 movementDir)
     switch (movementDir)
     {
     case MENU_DIR_UP:
-        if (*slotPtr == 0)
+        if (*slotPtr == 0 || *slotPtr == 1)
         {
             *slotPtr = PARTY_SIZE + 1;
         }
@@ -1570,7 +1570,7 @@ static void UpdatePartySelectionSingleLayout(s8 *slotPtr, s8 movementDir)
         }
         else
         {
-            (*slotPtr)--;
+            (*slotPtr) = (*slotPtr) - 2;
         }
         break;
     case MENU_DIR_DOWN:
@@ -1578,35 +1578,30 @@ static void UpdatePartySelectionSingleLayout(s8 *slotPtr, s8 movementDir)
         {
             *slotPtr = 0;
         }
+        else if (*slotPtr == (gPlayerPartyCount - 1) || *slotPtr == (gPlayerPartyCount - 2)) {
+            *slotPtr = PARTY_SIZE + 1;
+        }
         else
         {
-            if (*slotPtr == gPlayerPartyCount - 1)
-            {
-                if (sPartyMenuInternal->chooseHalf)
-                    *slotPtr = PARTY_SIZE;
-                else
-                    *slotPtr = PARTY_SIZE + 1;
-            }
-            else
-            {
-                (*slotPtr)++;
-            }
+            (*slotPtr) = (*slotPtr) + 2;
         }
         break;
     case MENU_DIR_RIGHT:
-        if (gPlayerPartyCount != 1 && *slotPtr == 0)
+        if (gPlayerPartyCount == 1 && *slotPtr == 0)
         {
-            if (sPartyMenuInternal->lastSelectedSlot == 0)
-                *slotPtr = 1;
-            else
-                *slotPtr = sPartyMenuInternal->lastSelectedSlot;
+            *slotPtr = PARTY_SIZE + 1;
+        }
+        if (*slotPtr % 2 == 0 && *slotPtr + 1 < gPlayerPartyCount) {
+            (*slotPtr)++;
         }
         break;
     case MENU_DIR_LEFT:
-        if (*slotPtr != 0 && *slotPtr != PARTY_SIZE && *slotPtr != PARTY_SIZE + 1)
+        if (gPlayerPartyCount == 1 && *slotPtr == PARTY_SIZE + 1)
         {
-            sPartyMenuInternal->lastSelectedSlot = *slotPtr;
             *slotPtr = 0;
+        }
+        else if (*slotPtr % 2 == 1 && *slotPtr != PARTY_SIZE + 1) {
+            (*slotPtr)--;
         }
         break;
     }

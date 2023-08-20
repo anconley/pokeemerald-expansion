@@ -1697,7 +1697,7 @@ u8 CreatePartyStatusSummarySprites(u8 battlerId, struct HpAndStatus *partyInfo, 
         }
         else
         {
-            gSprites[ballIconSpritesIds[i]].x -= 10 * (7 - i) + 24; //Changed 5-i to 7-i to avoid negative overflow, not sure if really necessary
+            gSprites[ballIconSpritesIds[i]].x -= 8 * (7 - i) + 24; //Changed 5-i to 7-i to avoid negative overflow, not sure if really necessary
             gSprites[ballIconSpritesIds[i]].data[1] = (8 - i) * 7 + 10; //Changed 6-i to 8-i for same reason
             gSprites[ballIconSpritesIds[i]].x2 = -120;
         }
