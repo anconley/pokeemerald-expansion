@@ -4557,6 +4557,55 @@ void ItemUseCB_Medicine(u8 taskId, TaskFunc task)
     }
 }
 
+void ItemUseCB_PokeItems(u8 taskId, TaskFunc task) 
+{
+    struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
+    struct PartyMenuInternal *ptr = sPartyMenuInternal;
+    s16 *arrayPtr = ptr->data;
+    u16 *itemPtr = &gSpecialVar_ItemId;
+    bool8 cannotUseEffect;
+    bool8 cardCheck;
+    u8 holdEffectParam = ItemId_GetHoldEffectParam(*itemPtr);
+
+    if(FlagGet(FLAG_IN_GAUNTLET)) {
+        gPartyMenuUseExitCallback = FALSE;
+        PlaySE(SE_SELECT);
+        DisplayPartyMenuMessage(gText_CantUseGauntlet, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = task;
+    }
+    else if(holdEffectParam == 1) {
+        // PokeHeal
+        cannotUse = ExecuteTableBasedItemEffect(mon, item, gPartyMenu.slotId, 0);
+
+
+    }
+    else {
+        // Status item
+
+    }
+}
+
+void ItemUseCB_FastTravel(u8 taskId, TaskFunc task)
+{
+    if(FlagGet(FLAG_IN_GAUNTLET)) {
+        gPartyMenuUseExitCallback = FALSE;
+        PlaySE(SE_SELECT);
+        DisplayPartyMenuMessage(gText_CantUseGauntlet, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = task;
+    }
+    else {
+        gPartyMenu.exitCallback = CB2_OpenFlyMap;
+        Task_ClosePartyMenu(taskId);
+    }
+}
+
+void ItemUseCB_Repellent(u8 taskId, TaskFunc task)
+{
+
+}
+
 #define tState      data[0]
 #define tSpecies    data[1]
 #define tAbilityNum data[2]

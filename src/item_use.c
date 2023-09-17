@@ -756,6 +756,24 @@ void ItemUseOutOfBattle_Medicine(u8 taskId)
     SetUpItemUseCallback(taskId);
 }
 
+void ItemUseOutOfBattle_PokeItems(u8 taskId)
+{
+    gItemUseCB = ItemUseCB_PokeItems;
+    SetUpItemUseCallback(taskId);
+}
+
+void ItemUseOutOfBattle_FastTravel(u8 taskId)
+{
+    gItemUseCB = ItemUseCB_FastTravel;
+    SetUpItemUseCallback(taskId);
+}
+
+void ItemUseOutOfBattle_Repellent(u8 taskId)
+{
+    gItemUseCB = ItemUseCB_Repellent;
+    SetUpItemUseCallback(taskId);
+}
+
 void ItemUseOutOfBattle_AbilityCapsule(u8 taskId)
 {
     gItemUseCB = ItemUseCB_AbilityCapsule;

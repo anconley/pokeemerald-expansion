@@ -852,6 +852,8 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     [ITEM_POKESLEEP] = {gItemIcon_BattleStatItem, gItemIconPalette_XSpeed},
     [ITEM_POKEPARA] = {gItemIcon_BattleStatItem, gItemIconPalette_DireHit},
     [ITEM_POKEFREEZE] = {gItemIcon_BattleStatItem, gItemIconPalette_XAccuracy},
+    [ITEM_FAST_TRAVEL] = {gItemIcon_PrettyFeather, gItemIconPalette_PrettyFeather},
+    [ITEM_REPELLENT] = {gItemIcon_Repel, gItemIconPalette_MaxRepel},
     // Return to field arrow
     [ITEMS_COUNT] = {gItemIcon_ReturnToFieldArrow, gItemIconPalette_ReturnToFieldArrow},
 };

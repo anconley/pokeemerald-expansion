@@ -3914,5 +3914,47 @@ static const u8 sBerserkGene[] = _(
     "lasting confusion.");
 
 static const u8 sTrainerCard[] = _(
-    "A unique item"
-    );
+    "A card unique to\n"
+    "every trainer and\n"
+    "tracks their level.");
+
+static const u8 sPokeHeal[] = _(
+    "Fully restores the\n"
+    "HP, PP, and status\n"
+    "of a Pokémon.");
+
+static const u8 sPokePoison[] = _(
+    "Inflicts poison\n"
+    "on the target\n"
+    "Pokémon.");
+
+static const u8 sPokeBurn[] = _(
+    "Inflicts a burn\n"
+    "on the target\n"
+    "Pokémon.");
+
+static const u8 sPokeSleep[] = _(
+    "Inflicts sleep\n"
+    "on the target\n"
+    "Pokémon.");
+
+static const u8 sPokePara[] = _(
+    "Inflicts paralysis\n"
+    "on the target\n"
+    "Pokémon.");
+
+static const u8 sPokeFreeze[] = _(
+    "Inflicts freeze\n"
+    "on the target\n"
+    "Pokémon.");
+
+static const u8 sFastTravel[] = _(
+    "Transports you\n"
+    "to a location\n"
+    "of your choice.");
+
+static const u8 sRepellent[] = _(
+    "Repels weak wild\n"
+    "Pokémon while it\n"
+    "is enabled.");
+

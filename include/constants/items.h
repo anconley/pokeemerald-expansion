@@ -981,9 +981,10 @@
 #define ITEM_POKESLEEP 803
 #define ITEM_POKEPARA 804
 #define ITEM_POKEFREEZE 805
-// add pokepoison, pokeburn, etc
+#define ITEM_FAST_TRAVEL 806
+#define ITEM_REPELLENT 807
 
-#define ITEMS_COUNT 806
+#define ITEMS_COUNT 808
 #define ITEM_FIELD_ARROW ITEMS_COUNT
 
 // A special item id associated with "Cancel"/"Exit" etc. in a list of items or decorations
@@ -1038,6 +1039,7 @@
 #define EXP_3000  3
 #define EXP_10000 4
 #define EXP_30000 5
+#define EXP_TRAINER_CARD 6
 
 // Item type IDs (used to determine the exit callback)
 #define ITEM_USE_MAIL             0

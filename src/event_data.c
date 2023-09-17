@@ -277,5 +277,8 @@ u8 GetLevelCap()
     if(FlagGet(FLAG_LEVEL_CAP_64)) {
         levelCap += 64;
     }
+    if(levelCap == 0) {
+        levelCap = 1;
+    }
     return levelCap;
 }

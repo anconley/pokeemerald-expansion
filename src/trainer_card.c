@@ -1019,8 +1019,8 @@ static void PrintIdOnCard(void)
     u8 *txtPtr;
     s32 xPos;
     u32 top;
-    txtPtr = StringCopy(buffer, gText_TrainerCardIDNo);
-    ConvertIntToDecimalStringN(txtPtr, sData->trainerCard.trainerId, STR_CONV_MODE_LEADING_ZEROS, 5);
+    txtPtr = StringCopy(buffer, gText_TrainerCardLevel);
+    ConvertIntToDecimalStringN(txtPtr, GetLevelCap(), STR_CONV_MODE_LEADING_ZEROS, 3);
     if (sData->cardType == CARD_TYPE_FRLG)
     {
         xPos = GetStringCenterAlignXOffset(FONT_NORMAL, buffer, 80) + 132;
@@ -1028,7 +1028,7 @@ static void PrintIdOnCard(void)
     }
     else
     {
-        xPos = GetStringCenterAlignXOffset(FONT_NORMAL, buffer, 96) + 120;
+        xPos = GetStringCenterAlignXOffset(FONT_NORMAL, buffer, 96) + 132;
         top = 9;
     }
 
