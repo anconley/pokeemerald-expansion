@@ -591,12 +591,10 @@ const u8 *const gItemEffectTable[ITEMS_COUNT] =
     [ITEM_HONDEW_BERRY]       = gItemEffect_HondewBerry,
     [ITEM_GREPA_BERRY]        = gItemEffect_GrepaBerry,
     [ITEM_TAMATO_BERRY]       = gItemEffect_TamatoBerry,
+
+    // Custom Items
     [ITEM_TRAINER_CARD]       = gItemEffect_RareCandy,
-    [ITEM_POKEHEAL]           = gItemEffect_RareCandy,
-    [ITEM_POKEPOISON]         = gItemEffect_RareCandy,
-    [ITEM_POKEBURN]           = gItemEffect_RareCandy,
-    [ITEM_POKESLEEP]          = gItemEffect_RareCandy,
-    [ITEM_POKEPARA]           = gItemEffect_RareCandy,
-    [ITEM_POKEFREEZE]         = gItemEffect_RareCandy,
+    [ITEM_POKEHEAL]           = gItemEffect_FullRestore,
+    [ITEM_POKEPOISON]         = gItemEffect_
     [LAST_BERRY_INDEX]        = NULL,    
 };
