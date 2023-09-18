@@ -976,15 +976,15 @@
 
 #define ITEM_TRAINER_CARD 799
 #define ITEM_POKEHEAL 800
-#define ITEM_POKEPOISON 801
+/*#define ITEM_POKEPOISON 801
 #define ITEM_POKEBURN 802
 #define ITEM_POKESLEEP 803
 #define ITEM_POKEPARA 804
-#define ITEM_POKEFREEZE 805
-#define ITEM_FAST_TRAVEL 806
-#define ITEM_REPELLENT 807
+#define ITEM_POKEFREEZE 805*/
+#define ITEM_FAST_TRAVEL 801
+#define ITEM_REPELLENT 802
 
-#define ITEMS_COUNT 808
+#define ITEMS_COUNT 803
 #define ITEM_FIELD_ARROW ITEMS_COUNT
 
 // A special item id associated with "Cancel"/"Exit" etc. in a list of items or decorations

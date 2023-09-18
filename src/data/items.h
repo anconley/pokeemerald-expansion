@@ -10367,7 +10367,7 @@ const struct Item gItems[] =
         .importance = 1,
         .registrability = TRUE,
         .pocket = POCKET_KEY_ITEMS,
-        .type = ITEM_USE_FIELD,
+        .type = ITEM_USE_PARTY_MENU,
         .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
     },
 
@@ -10376,15 +10376,14 @@ const struct Item gItems[] =
         .name = _("PokéHeal"),
         .itemId = ITEM_POKEHEAL,
         .price = 0,
-        .holdEffectParam = 1,
         .description = sFullRestoreDesc,
         .importance = 1,
         .registrability = TRUE,
         .pocket = POCKET_KEY_ITEMS,
-        .type = ITEM_USE_FIELD,
-        .fieldUseFunc = ItemUseOutOfBattle_PokeItems,
+        .type = ITEM_USE_PARTY_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_PokeHeal,
     },
-
+/*
     [ITEM_POKEPOISON] =
     {
         .name = _("PokéPoison"),
@@ -10454,7 +10453,7 @@ const struct Item gItems[] =
         .type = ITEM_USE_FIELD,
         .fieldUseFunc = ItemUseOutOfBattle_PokeItems,
     },
-
+*/
     [ITEM_FAST_TRAVEL] =
     {
         .name = _("Fast Travel"),
@@ -10465,7 +10464,7 @@ const struct Item gItems[] =
         .registrability = TRUE,
         .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_FIELD,
-        .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
+        .fieldUseFunc = ItemUseOutOfBattle_FastTravel,
     },
 
     [ITEM_REPELLENT] =
@@ -10479,6 +10478,6 @@ const struct Item gItems[] =
         .registrability = TRUE,
         .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_FIELD,
-        .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
+        .fieldUseFunc = ItemUseOutOfBattle_Repellent,
     }
 };

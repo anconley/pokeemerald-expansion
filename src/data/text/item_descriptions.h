@@ -3923,7 +3923,7 @@ static const u8 sPokeHeal[] = _(
     "HP, PP, and status\n"
     "of a Pokémon.");
 
-static const u8 sPokePoison[] = _(
+/*static const u8 sPokePoison[] = _(
     "Inflicts poison\n"
     "on the target\n"
     "Pokémon.");
@@ -3946,7 +3946,7 @@ static const u8 sPokePara[] = _(
 static const u8 sPokeFreeze[] = _(
     "Inflicts freeze\n"
     "on the target\n"
-    "Pokémon.");
+    "Pokémon.");*/
 
 static const u8 sFastTravel[] = _(
     "Transports you\n"

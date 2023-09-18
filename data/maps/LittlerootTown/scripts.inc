@@ -248,10 +248,15 @@ LittlerootTown_EventScript_SetRivalBirchPosForDexUpgradeFemale::
 
 LittlerootTown_EventScript_FatMan::
 	msgbox LittlerootTown_Text_CanUsePCToStoreItems, MSGBOX_NPC
+	setflag FLAG_LEVEL_CAP_8
 	end
 
 LittlerootTown_EventScript_Boy::
 	msgbox LittlerootTown_Text_BirchSpendsDaysInLab, MSGBOX_NPC
+	giveitem ITEM_TRAINER_CARD
+	giveitem ITEM_POKEHEAL
+	giveitem ITEM_FAST_TRAVEL
+	giveitem ITEM_REPELLENT
 	end
 
 LittlerootTown_EventScript_Twin::

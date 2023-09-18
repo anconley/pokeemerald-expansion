@@ -49,7 +49,7 @@
 #define FLAG_LEVEL_CAP_32    0x25 // Unused Flag
 #define FLAG_LEVEL_CAP_64    0x26 // Unused Flag
 #define FLAG_IN_GAUNTLET     0x27 // Unused Flag
-#define FLAG_UNUSED_0x028    0x28 // Unused Flag
+#define FLAG_REPELLENT_ON    0x28 // Unused Flag
 #define FLAG_UNUSED_0x029    0x29 // Unused Flag
 #define FLAG_UNUSED_0x02A    0x2A // Unused Flag
 #define FLAG_UNUSED_0x02B    0x2B // Unused Flag

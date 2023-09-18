@@ -594,7 +594,5 @@ const u8 *const gItemEffectTable[ITEMS_COUNT] =
 
     // Custom Items
     [ITEM_TRAINER_CARD]       = gItemEffect_RareCandy,
-    [ITEM_POKEHEAL]           = gItemEffect_FullRestore,
-    [ITEM_POKEPOISON]         = gItemEffect_
     [LAST_BERRY_INDEX]        = NULL,    
 };

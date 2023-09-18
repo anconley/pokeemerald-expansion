@@ -756,9 +756,9 @@ void ItemUseOutOfBattle_Medicine(u8 taskId)
     SetUpItemUseCallback(taskId);
 }
 
-void ItemUseOutOfBattle_PokeItems(u8 taskId)
+void ItemUseOutOfBattle_PokeHeal(u8 taskId)
 {
-    gItemUseCB = ItemUseCB_PokeItems;
+    gItemUseCB = ItemUseCB_PokeHeal;
     SetUpItemUseCallback(taskId);
 }
 

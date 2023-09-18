@@ -847,11 +847,11 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     // Custom
     [ITEM_TRAINER_CARD] = {gItemIcon_CardKey, gItemIconPalette_CardKey},
     [ITEM_POKEHEAL] = {gItemIcon_BattleStatItem, gItemIconPalette_GuardSpec},
-    [ITEM_POKEPOISON] = {gItemIcon_BattleStatItem, gItemIconPalette_XDefend},
+    /*[ITEM_POKEPOISON] = {gItemIcon_BattleStatItem, gItemIconPalette_XDefend},
     [ITEM_POKEBURN] = {gItemIcon_BattleStatItem, gItemIconPalette_XAttack},
     [ITEM_POKESLEEP] = {gItemIcon_BattleStatItem, gItemIconPalette_XSpeed},
     [ITEM_POKEPARA] = {gItemIcon_BattleStatItem, gItemIconPalette_DireHit},
-    [ITEM_POKEFREEZE] = {gItemIcon_BattleStatItem, gItemIconPalette_XAccuracy},
+    [ITEM_POKEFREEZE] = {gItemIcon_BattleStatItem, gItemIconPalette_XAccuracy},*/
     [ITEM_FAST_TRAVEL] = {gItemIcon_PrettyFeather, gItemIconPalette_PrettyFeather},
     [ITEM_REPELLENT] = {gItemIcon_Repel, gItemIconPalette_MaxRepel},
     // Return to field arrow

@@ -490,6 +490,7 @@ extern const u8 gText_MovesPPIncreased[];
 extern const u8 gText_PPWasRestored[];
 extern const u8 gText_WontHaveEffect[];
 extern const u8 gText_CantUseGauntlet[];
+extern const u8 gText_AtLevelCap[];
 extern const u8 gText_PkmnSnappedOutOfConfusion[];
 extern const u8 gText_PkmnFriendlyBaseVar2Fell[];
 extern const u8 gText_PkmnFriendlyBaseVar2CantFall[];
