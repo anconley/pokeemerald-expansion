@@ -10463,7 +10463,7 @@ const struct Item gItems[] =
         .importance = 1,
         .registrability = TRUE,
         .pocket = POCKET_KEY_ITEMS,
-        .type = ITEM_USE_FIELD,
+        .type = ITEM_USE_BAG_MENU,
         .fieldUseFunc = ItemUseOutOfBattle_FastTravel,
     },
 
@@ -10475,9 +10475,8 @@ const struct Item gItems[] =
         .holdEffectParam = 6,
         .description = sRepellent,
         .importance = 1,
-        .registrability = TRUE,
         .pocket = POCKET_KEY_ITEMS,
-        .type = ITEM_USE_FIELD,
+        .type = ITEM_USE_BAG_MENU,
         .fieldUseFunc = ItemUseOutOfBattle_Repellent,
     }
 };

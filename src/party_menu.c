@@ -4642,11 +4642,6 @@ void ItemUseCB_FastTravel(u8 taskId, TaskFunc task)
     }
 }
 
-void ItemUseCB_Repellent(u8 taskId, TaskFunc task)
-{
-
-}
-
 #define tState      data[0]
 #define tSpecies    data[1]
 #define tAbilityNum data[2]
