@@ -253,6 +253,7 @@ LittlerootTown_EventScript_FatMan::
 
 LittlerootTown_EventScript_Boy::
 	msgbox LittlerootTown_Text_BirchSpendsDaysInLab, MSGBOX_NPC
+	special EnableNationalPokedex
 	giveitem ITEM_TRAINER_CARD
 	giveitem ITEM_POKEHEAL
 	giveitem ITEM_FAST_TRAVEL

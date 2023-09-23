@@ -4327,6 +4327,7 @@ u16 GetHoennPokedexCount(u8 caseID)
     return count;
 }
 
+// Crazy Eight TODO: whatever this does (seems unused though)
 u16 GetKantoPokedexCount(u8 caseID)
 {
     u16 count = 0;
@@ -4362,6 +4363,7 @@ bool16 HasAllHoennMons(void)
     return TRUE;
 }
 
+// Crazy Eight TODO: whatever this does (seems unused though)
 bool8 HasAllKantoMons(void)
 {
     u16 i;
