@@ -7179,6 +7179,30 @@ const struct PokedexEntry gPokedexEntries[] =
         .trainerOffset = 0,
     },
 
+    [NATIONAL_DEX_DARUMAKA_GALAR] =
+    {
+        .categoryName = _("Zen Charm"),
+        .height = 6,
+        .weight = 375,
+        .description = gDarumakaPokedexText,
+        .pokemonScale = 422,
+        .pokemonOffset = 14,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_DARMANITAN_GALAR] =
+    {
+        .categoryName = _("Zen Charm"),
+        .height = 13,
+        .weight = 929,
+        .description = gDarmanitanPokedexText,
+        .pokemonScale = 272,
+        .pokemonOffset = 3,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
     [NATIONAL_DEX_MARACTUS] =
     {
         .categoryName = _("Cactus"),
