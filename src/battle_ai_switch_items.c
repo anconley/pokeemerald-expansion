@@ -1896,8 +1896,9 @@ u8 GetMostSuitableMonToSwitchInto(u32 battler, bool32 switchAfterMonKOd)
     s32 lastId = 0; // + 1
     struct Pokemon *party;
 
-    if (*(gBattleStruct->monToSwitchIntoId + battler) != PARTY_SIZE)
-        return *(gBattleStruct->monToSwitchIntoId + battler);
+    // Commented out since new party size makes the Struct carry junk data.
+    /*if (*(gBattleStruct->monToSwitchIntoId + battler) != PARTY_SIZE)
+        return *(gBattleStruct->monToSwitchIntoId + battler);*/
     if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
         return gBattlerPartyIndexes[battler] + 1;
 

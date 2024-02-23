@@ -16,7 +16,7 @@ int GameClear(void)
     struct RibbonCounter {
         u8 partyIndex;
         u8 count;
-    } ribbonCounts[6];
+    } ribbonCounts[PARTY_SIZE];
 
     HealPlayerParty();
 

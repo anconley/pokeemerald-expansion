@@ -62,8 +62,8 @@
 struct ApprenticePartyMovesData
 {
     u8 moveCounter;
-    u16 moves[MULTI_PARTY_SIZE][NUM_WHICH_MOVE_QUESTIONS];
-    u8 moveSlots[MULTI_PARTY_SIZE][NUM_WHICH_MOVE_QUESTIONS];
+    u16 moves[3][NUM_WHICH_MOVE_QUESTIONS];
+    u8 moveSlots[3][NUM_WHICH_MOVE_QUESTIONS];
 };
 
 struct ApprenticeQuestionData
@@ -216,7 +216,7 @@ static void ShuffleApprenticeSpecies(void)
         SWAP(species[rand1], species[rand2], temp);
     }
 
-    for (i = 0; i < MULTI_PARTY_SIZE; i++)
+    for (i = 0; i < 3; i++)
         PLAYER_APPRENTICE.speciesIds[i] = ((species[i * 2] & 0xF) << 4) | ((species[i * 2 + 1]) & 0xF);
 }
 
@@ -231,13 +231,13 @@ static u8 GetMonIdForQuestion(u8 questionId, u8 *party, u8 *partySlot)
     {
         do
         {
-            monId = Random() % (MULTI_PARTY_SIZE);
+            monId = Random() % (3);
             for (count = 0, i = 0; i < NUM_WHICH_MOVE_QUESTIONS; i++)
             {
                 if (gApprenticePartyMovesData->moves[monId][i] != MOVE_NONE)
                     count++;
             }
-        } while (count > MULTI_PARTY_SIZE);
+        } while (count > 3);
     }
     else if (questionId == QUESTION_ID_WHAT_ITEM)
     {
@@ -252,7 +252,7 @@ static u8 GetMonIdForQuestion(u8 questionId, u8 *party, u8 *partySlot)
 static void SetRandomQuestionData(void)
 {
     u8 questionOrder[APPRENTICE_MAX_QUESTIONS + 1];
-    u8 partyOrder[MULTI_PARTY_SIZE];
+    u8 partyOrder[3];
     u8 partySlot;
     u8 i, j;
     u8 rand1, rand2;
@@ -286,7 +286,7 @@ static void SetRandomQuestionData(void)
     gApprenticePartyMovesData->moveCounter = 0;
     for (i = 0; i < NUM_WHICH_MOVE_QUESTIONS; i++)
     {
-        for (j = 0; j < MULTI_PARTY_SIZE; j++)
+        for (j = 0; j < 3; j++)
             gApprenticePartyMovesData->moveSlots[j][i] = MAX_MON_MOVES;
     }
 
@@ -321,7 +321,7 @@ static void SetRandomQuestionData(void)
 }
 
 #define APPRENTICE_SPECIES_ID(monId) \
-    ((monId < MULTI_PARTY_SIZE) ? (PLAYER_APPRENTICE.speciesIds[monId] >> (((PLAYER_APPRENTICE.party >> monId) & 1) << 2) & 0xF) : 0)
+    ((monId < 3) ? (PLAYER_APPRENTICE.speciesIds[monId] >> (((PLAYER_APPRENTICE.party >> monId) & 1) << 2) & 0xF) : 0)
 
 #define APPRENTICE_SPECIES_ID_NO_COND(monId, count) \
     monId = ((PLAYER_APPRENTICE.party >> count) & 1); \
@@ -512,11 +512,11 @@ static u16 GetDefaultMove(u8 monId, u8 speciesArrayId, u8 moveSlot)
 
 static void SaveApprenticeParty(u8 numQuestions)
 {
-    struct ApprenticeMon *apprenticeMons[MULTI_PARTY_SIZE];
+    struct ApprenticeMon *apprenticeMons[3];
     u8 i, j;
     u32 speciesTableId;
 
-    for (i = 0; i < MULTI_PARTY_SIZE; i++)
+    for (i = 0; i < 3; i++)
     {
         gSaveBlock2Ptr->apprentices[0].party[i].species = SPECIES_NONE;
         gSaveBlock2Ptr->apprentices[0].party[i].item = ITEM_NONE;
@@ -526,14 +526,14 @@ static void SaveApprenticeParty(u8 numQuestions)
 
     // Save party order
     j = PLAYER_APPRENTICE.leadMonId;
-    for (i = 0; i < MULTI_PARTY_SIZE; i++)
+    for (i = 0; i < 3; i++)
     {
         apprenticeMons[j] = &gSaveBlock2Ptr->apprentices[0].party[i];
-        j = (j + 1) % (MULTI_PARTY_SIZE);
+        j = (j + 1) % (3);
     }
 
     // Save party species
-    for (i = 0; i < MULTI_PARTY_SIZE; i++)
+    for (i = 0; i < 3; i++)
     {
         speciesTableId = APPRENTICE_SPECIES_ID(i);
         apprenticeMons[i]->species = gApprentices[PLAYER_APPRENTICE.id].species[speciesTableId];
@@ -581,10 +581,10 @@ static void CreateApprenticeMenu(u8 menu)
         strings[1] = gText_OpenLevel;
         break;
     case APPRENTICE_ASK_3SPECIES:
-        count = MULTI_PARTY_SIZE;
+        count = 3;
         left = 18;
         top = 6;
-        for (i = 0; i < MULTI_PARTY_SIZE; i++)
+        for (i = 0; i < 3; i++)
         {
             u16 species;
             u32 speciesTableId;
@@ -734,7 +734,7 @@ static void Script_ResetPlayerApprentice(void)
     PLAYER_APPRENTICE.leadMonId = 0;
     PLAYER_APPRENTICE.party = 0;
 
-    for (i = 0; i < MULTI_PARTY_SIZE; i++)
+    for (i = 0; i < 3; i++)
         PLAYER_APPRENTICE.speciesIds[i] = 0;
 
     for (i = 0; i < APPRENTICE_MAX_QUESTIONS; i++)
@@ -988,7 +988,7 @@ static void InitQuestionData(void)
     {
         if (PLAYER_APPRENTICE.questionsAnswered < NUM_WHICH_MON_QUESTIONS)
         {
-            // For the first MULTI_PARTY_SIZE (3) questions, a mon is asked to be selected for the Apprentice's party
+            // For the first 3 (3) questions, a mon is asked to be selected for the Apprentice's party
             id1 = PLAYER_APPRENTICE.speciesIds[PLAYER_APPRENTICE.questionsAnswered] >> 4;
             gApprenticeQuestionData->altSpeciesId = gApprentices[PLAYER_APPRENTICE.id].species[id1];
 

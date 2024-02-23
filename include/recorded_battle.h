@@ -3,7 +3,7 @@
 
 #include "constants/battle.h"
 
-#define BATTLER_RECORD_SIZE 664
+#define BATTLER_RECORD_SIZE 332 // originally 664
 
 struct RecordedBattleSave
 {
