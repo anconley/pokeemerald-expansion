@@ -475,6 +475,11 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
     u8 wildMonIndex = 0;
     u8 level;
 
+    if (FlagGet(FLAG_REPELLENT_ON))
+    {
+        return FALSE;
+    }
+
     switch (area)
     {
     case WILD_AREA_LAND:

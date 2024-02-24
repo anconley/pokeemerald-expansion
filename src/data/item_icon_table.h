@@ -859,6 +859,11 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     [ITEM_SWIFT_MOCHI] =  {gItemIcon_Mochi, gItemIconPalette_SwiftMochi},
     [ITEM_FRESH_START_MOCHI] =  {gItemIcon_Mochi, gItemIconPalette_FreshStartMochi},
     [ITEM_GLIMMERING_CHARM] = {gItemIcon_GlimmeringCharm, gItemIconPalette_GlimmeringCharm},
+    // Custom Items
+    [ITEM_TRAINER_CARD] = {gItemIcon_CardKey, gItemIconPalette_CardKey},
+    [ITEM_POKEHEAL] = {gItemIcon_BattleStatItem, gItemIconPalette_GuardSpec},
+    [ITEM_FAST_TRAVEL] = {gItemIcon_PrettyFeather, gItemIconPalette_PrettyFeather},
+    [ITEM_REPELLENT] = {gItemIcon_Repel, gItemIconPalette_MaxRepel},
     // Return to field arrow
     [ITEMS_COUNT] = {gItemIcon_ReturnToFieldArrow, gItemIconPalette_ReturnToFieldArrow},
 };

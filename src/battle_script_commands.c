@@ -4081,7 +4081,11 @@ static void Cmd_getexp(void)
     switch (gBattleScripting.getexpState)
     {
     case 0: // check if should receive exp at all
-        if (GetBattlerSide(gBattlerFainted) != B_SIDE_OPPONENT
+        
+        // No experience gain in Crazy Eight
+        gBattleScripting.getexpState = 6; // goto last case
+
+        /*if (GetBattlerSide(gBattlerFainted) != B_SIDE_OPPONENT
             || IsAiVsAiBattle()
             || !BattleTypeAllowsExp())
         {
@@ -4091,7 +4095,7 @@ static void Cmd_getexp(void)
         {
             gBattleScripting.getexpState++;
             gBattleStruct->givenExpMons |= gBitTable[gBattlerPartyIndexes[gBattlerFainted]];
-        }
+        }*/
         break;
     case 1: // calculate experience points to redistribute
         {

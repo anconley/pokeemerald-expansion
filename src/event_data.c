@@ -247,3 +247,33 @@ bool8 FlagGet(u16 id)
 
     return TRUE;
 }
+
+u8 GetLevelCap()
+{
+    u8 levelCap = 0;
+    if (FlagGet(FLAG_LEVEL_CAP_1)) {
+        levelCap += 1;
+    }
+    if (FlagGet(FLAG_LEVEL_CAP_2)) {
+        levelCap += 2;
+    }
+    if (FlagGet(FLAG_LEVEL_CAP_4)) {
+        levelCap += 4;
+    }
+    if (FlagGet(FLAG_LEVEL_CAP_8)) {
+        levelCap += 8;
+    }
+    if (FlagGet(FLAG_LEVEL_CAP_16)) {
+        levelCap += 16;
+    }
+    if (FlagGet(FLAG_LEVEL_CAP_32)) {
+        levelCap += 32;
+    }
+    if (FlagGet(FLAG_LEVEL_CAP_64)) {
+        levelCap += 64;
+    }
+    if (levelCap == 0) {
+        levelCap = 1;
+    }
+    return levelCap;
+}

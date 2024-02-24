@@ -133,10 +133,10 @@ enum {
     FIELD_MOVE_ROCK_SMASH,  // FLAG_BADGE03_GET
     FIELD_MOVE_STRENGTH,    // FLAG_BADGE04_GET
     FIELD_MOVE_SURF,        // FLAG_BADGE05_GET
-    FIELD_MOVE_FLY,         // FLAG_BADGE06_GET
+    FIELD_MOVE_TELEPORT,    // FLAG_BADGE06_GET
     FIELD_MOVE_DIVE,        // FLAG_BADGE07_GET
     FIELD_MOVE_WATERFALL,   // FLAG_BADGE08_GET
-    FIELD_MOVE_TELEPORT,
+    FIELD_MOVE_FLY,
     FIELD_MOVE_DIG,
     FIELD_MOVE_SECRET_POWER,
     FIELD_MOVE_MILK_DRINK,
@@ -4720,6 +4720,91 @@ void ItemUseCB_Medicine(u8 taskId, TaskFunc task)
     }
 }
 
+void ItemUseCB_PokeHeal(u8 taskId, TaskFunc task) 
+{
+    u8 j;
+    u8 ppBonuses;
+    u8 arg[4];
+    u16 hp = 0;
+    u16 maxHP;
+    bool8 canHeal = TRUE;
+    struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
+
+    if(FlagGet(FLAG_IN_GAUNTLET)) {
+        gPartyMenuUseExitCallback = FALSE;
+        PlaySE(SE_SELECT);
+        DisplayPartyMenuMessage(gText_CantUseGauntlet, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = task;
+    }
+    else {
+        hp = GetMonData(mon, MON_DATA_HP);
+        if (hp == GetMonData(mon, MON_DATA_MAX_HP))
+            canHeal = FALSE;
+
+        // restore HP
+        maxHP = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_MAX_HP);
+        arg[0] = maxHP;
+        arg[1] = maxHP >> 8;
+        SetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_HP, arg);
+        ppBonuses = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_PP_BONUSES);
+
+        // restore PP
+        for(j = 0; j < MAX_MON_MOVES; j++)
+        {
+            arg[0] = CalculatePPWithBonus(GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_MOVE1 + j), ppBonuses, j);
+            SetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_PP1 + j, arg);
+        }
+
+        // restore status
+        arg[0] = 0;
+        arg[1] = 0;
+        arg[2] = 0;
+        arg[3] = 0;
+        SetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_STATUS, arg);
+
+        // Update display and play sound
+        gPartyMenuUseExitCallback = TRUE;
+        PlaySE(SE_USE_ITEM);
+        SetPartyMonAilmentGfx(mon, &sPartyMenuBoxes[gPartyMenu.slotId]);
+        if (gSprites[sPartyMenuBoxes[gPartyMenu.slotId].statusSpriteId].invisible)
+            DisplayPartyPokemonLevelCheck(mon, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
+        if (canHeal == TRUE)
+        {
+            if (hp == 0)
+                AnimatePartySlot(gPartyMenu.slotId, 1);
+            PartyMenuModifyHP(taskId, gPartyMenu.slotId, 1, GetMonData(mon, MON_DATA_HP) - hp, Task_DisplayHPRestoredMessage);
+            ResetHPTaskData(taskId, 0, hp);
+            DisplayPartyPokemonGenderNidoranCheck(&gPlayerParty[gPartyMenu.slotId], &sPartyMenuBoxes[gPartyMenu.slotId], 0);
+            return;
+        }
+        else
+        {
+            DisplayPartyPokemonGenderNidoranCheck(&gPlayerParty[gPartyMenu.slotId], &sPartyMenuBoxes[gPartyMenu.slotId], 0);
+            GetMonNickname(mon, gStringVar1);
+            StringExpandPlaceholders(gStringVar4, gText_PkmnBecameHealthy);
+            DisplayPartyMenuMessage(gStringVar4, TRUE);
+            ScheduleBgCopyTilemapToVram(2);
+            gTasks[taskId].func = task;
+        }
+    }
+}
+
+void ItemUseCB_FastTravel(u8 taskId, TaskFunc task)
+{
+    if(FlagGet(FLAG_IN_GAUNTLET)) {
+        gPartyMenuUseExitCallback = FALSE;
+        PlaySE(SE_SELECT);
+        DisplayPartyMenuMessage(gText_CantUseGauntlet, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = task;
+    }
+    else {
+        gPartyMenu.exitCallback = CB2_OpenFlyMap;
+        Task_ClosePartyMenu(taskId);
+    }
+}
+
 #define tState      data[0]
 #define tSpecies    data[1]
 #define tAbilityNum data[2]
@@ -5463,6 +5548,12 @@ static void UNUSED DisplayExpPoints(u8 taskId, TaskFunc task, u8 holdEffectParam
     gTasks[taskId].func = task;
 }
 
+bool8 CheckTrainerCardLevelUp(u8 initialLevel)
+{
+    u8 levelCap = GetLevelCap();
+    return (initialLevel < levelCap);
+}
+
 void ItemUseCB_RareCandy(u8 taskId, TaskFunc task)
 {
     struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
@@ -5470,10 +5561,18 @@ void ItemUseCB_RareCandy(u8 taskId, TaskFunc task)
     s16 *arrayPtr = ptr->data;
     u16 *itemPtr = &gSpecialVar_ItemId;
     bool8 cannotUseEffect;
+    bool8 cardCheck;
     u8 holdEffectParam = ItemId_GetHoldEffectParam(*itemPtr);
 
     sInitialLevel = GetMonData(mon, MON_DATA_LEVEL);
-    if (sInitialLevel != MAX_LEVEL)
+
+    // Check if trainer card should do a level up
+    cardCheck = TRUE;
+    if (holdEffectParam == EXP_TRAINER_CARD) {
+        cardCheck = CheckTrainerCardLevelUp(sInitialLevel);
+    }
+
+    if (sInitialLevel != MAX_LEVEL && cardCheck)
     {
         BufferMonStatsToTaskData(mon, arrayPtr);
         cannotUseEffect = ExecuteTableBasedItemEffect(mon, *itemPtr, gPartyMenu.slotId, 0);
@@ -5506,7 +5605,12 @@ void ItemUseCB_RareCandy(u8 taskId, TaskFunc task)
         else
         {
             gPartyMenuUseExitCallback = FALSE;
-            DisplayPartyMenuMessage(gText_WontHaveEffect, TRUE);
+            if(cardCheck == FALSE) {
+                DisplayPartyMenuMessage(gText_AtLevelCap, TRUE);
+            }
+            else {
+                DisplayPartyMenuMessage(gText_WontHaveEffect, TRUE);
+            }
             ScheduleBgCopyTilemapToVram(2);
             gTasks[taskId].func = task;
         }
@@ -5516,12 +5620,14 @@ void ItemUseCB_RareCandy(u8 taskId, TaskFunc task)
         sFinalLevel = GetMonData(mon, MON_DATA_LEVEL, NULL);
         gPartyMenuUseExitCallback = TRUE;
         UpdateMonDisplayInfoAfterRareCandy(gPartyMenu.slotId, mon);
-        RemoveBagItem(gSpecialVar_ItemId, 1);
+        if (holdEffectParam != EXP_TRAINER_CARD) {
+            RemoveBagItem(gSpecialVar_ItemId, 1);
+        }
         GetMonNickname(mon, gStringVar1);
         if (sFinalLevel > sInitialLevel)
         {
             PlayFanfareByFanfareNum(FANFARE_LEVEL_UP);
-            if (holdEffectParam == 0) // Rare Candy
+            if (holdEffectParam == 0 || holdEffectParam == EXP_TRAINER_CARD) // Rare Candy
             {
                 ConvertIntToDecimalStringN(gStringVar2, sFinalLevel, STR_CONV_MODE_LEFT_ALIGN, 3);
                 StringExpandPlaceholders(gStringVar4, gText_PkmnElevatedToLvVar2);
@@ -5533,6 +5639,7 @@ void ItemUseCB_RareCandy(u8 taskId, TaskFunc task)
                 StringExpandPlaceholders(gStringVar4, gText_PkmnGainedExpAndElevatedToLvVar3);
             }
 
+            DisplayPartyPokemonGenderNidoranCheck(&gPlayerParty[gPartyMenu.slotId], &sPartyMenuBoxes[gPartyMenu.slotId], 0);
             DisplayPartyMenuMessage(gStringVar4, TRUE);
             ScheduleBgCopyTilemapToVram(2);
             gTasks[taskId].func = Task_DisplayLevelUpStatsPg1;

@@ -3993,3 +3993,23 @@ static const u8 sGlimmeringCharmDesc[] = _(
     "A charm that will\n"
     "raise the shards\n"
     "from Tera Raids.");
+
+static const u8 sTrainerCard[] = _(
+    "A card unique to\n"
+    "every trainer and\n"
+    "tracks their level.");
+
+static const u8 sPokeHeal[] = _(
+    "Fully restores the\n"
+    "HP, PP, and status\n"
+    "of a Pokémon.");
+
+static const u8 sFastTravel[] = _(
+    "Transports you\n"
+    "to a location\n"
+    "of your choice.");
+
+static const u8 sRepellent[] = _(
+    "Repels weak wild\n"
+    "Pokémon while it\n"
+    "is enabled.");

@@ -989,7 +989,13 @@
 #define ITEM_814 814 // TWV0YWwgQWxsb3k=
 #define ITEM_815 815 // U3RlbGxhciBUZXJhIFNoYXJk
 
-#define ITEMS_COUNT 816
+// Custom Items
+#define ITEM_TRAINER_CARD 816
+#define ITEM_POKEHEAL 817
+#define ITEM_FAST_TRAVEL 818
+#define ITEM_REPELLENT 819
+
+#define ITEMS_COUNT 820
 #define ITEM_FIELD_ARROW ITEMS_COUNT
 
 // A special item id associated with "Cancel"/"Exit" etc. in a list of items or decorations
@@ -1044,6 +1050,7 @@
 #define EXP_3000  3
 #define EXP_10000 4
 #define EXP_30000 5
+#define EXP_TRAINER_CARD 6
 
 // Item type IDs (used to determine the exit callback)
 #define ITEM_USE_MAIL             0

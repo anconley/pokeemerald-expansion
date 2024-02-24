@@ -569,6 +569,10 @@ const u8 *const gItemEffectTable[ITEMS_COUNT] =
     [ITEM_EXP_CANDY_XL]       = gItemEffect_RareCandy,
     //[ITEM_DYNAMAX_CANDY]      = gItemEffect_DynamaxCandy, // Todo
 
+    [ITEM_TRAINER_CARD]       = gItemEffect_RareCandy,
+    [ITEM_POKEHEAL]           = gItemEffect_RareCandy,
+    [ITEM_REPELLENT]          = gItemEffect_RareCandy,
+
     // Medicinal Flutes
     [ITEM_BLUE_FLUTE]         = gItemEffect_BlueFlute,
     [ITEM_YELLOW_FLUTE]       = gItemEffect_YellowFlute,

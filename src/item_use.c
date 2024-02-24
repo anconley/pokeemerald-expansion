@@ -32,6 +32,7 @@
 #include "party_menu.h"
 #include "pokeblock.h"
 #include "pokemon.h"
+#include "region_map.h"
 #include "script.h"
 #include "sound.h"
 #include "strings.h"
@@ -73,6 +74,8 @@ static void Task_StartUseRepel(u8);
 static void Task_StartUseLure(u8 taskId);
 static void Task_UseRepel(u8);
 static void Task_UseLure(u8 taskId);
+static void Task_StartUseRepellent(u8);
+static void Task_UseRepellent(u8);
 static void Task_CloseCantUseKeyItemMessage(u8);
 static void SetDistanceOfClosestHiddenItem(u8, s16, s16);
 static void CB2_OpenPokeblockFromBag(void);
@@ -784,6 +787,59 @@ void ItemUseOutOfBattle_Medicine(u8 taskId)
 {
     gItemUseCB = ItemUseCB_Medicine;
     SetUpItemUseCallback(taskId);
+}
+
+void ItemUseOutOfBattle_PokeHeal(u8 taskId)
+{
+    gItemUseCB = ItemUseCB_PokeHeal;
+    SetUpItemUseCallback(taskId);
+}
+
+void ItemUseOutOfBattle_FastTravel(u8 taskId)
+{
+    if (Overworld_MapTypeAllowsTeleportAndFly(gMapHeader.mapType) != TRUE) {
+        PlaySE(SE_SELECT);
+        DisplayItemMessage(taskId, FONT_NORMAL, gText_CantUseGauntlet, CloseItemMessage);
+    }
+    else if (FlagGet(FLAG_IN_GAUNTLET)) {
+        PlaySE(SE_SELECT);
+        DisplayItemMessage(taskId, FONT_NORMAL, gText_CantUseGauntlet, CloseItemMessage);
+    }
+    else {
+        gBagMenu->newScreenCallback = CB2_OpenFlyMap;
+        Task_FadeAndCloseBagMenu(taskId);
+    }
+}
+
+void ItemUseOutOfBattle_Repellent(u8 taskId)
+{
+    gTasks[taskId].func = Task_StartUseRepellent;
+}
+
+static void Task_StartUseRepellent(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    if (FlagGet(FLAG_REPELLENT_ON)) {
+        PlaySE(SE_SELECT);
+        FlagClear(FLAG_REPELLENT_ON);
+        DisplayItemMessage(taskId, FONT_NORMAL, gText_RepellentOff, CloseItemMessage);
+    }
+    else if (++data[8] > 7)
+    {
+        data[8] = 0;
+        PlaySE(SE_REPEL);
+        gTasks[taskId].func = Task_UseRepellent;
+    }
+}
+
+static void Task_UseRepellent(u8 taskId)
+{
+    if (!IsSEPlaying())
+    {
+        FlagSet(FLAG_REPELLENT_ON);
+        DisplayItemMessage(taskId, FONT_NORMAL, gText_RepellentOn, CloseItemMessage);
+    }
 }
 
 void ItemUseOutOfBattle_AbilityCapsule(u8 taskId)

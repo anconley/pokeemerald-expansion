@@ -42,15 +42,15 @@
 #define TEMP_FLAGS_END   FLAG_TEMP_1F
 #define NUM_TEMP_FLAGS   (TEMP_FLAGS_END - TEMP_FLAGS_START + 1)
 
-#define FLAG_UNUSED_0x020    0x20 // Unused Flag
-#define FLAG_UNUSED_0x021    0x21 // Unused Flag
-#define FLAG_UNUSED_0x022    0x22 // Unused Flag
-#define FLAG_UNUSED_0x023    0x23 // Unused Flag
-#define FLAG_UNUSED_0x024    0x24 // Unused Flag
-#define FLAG_UNUSED_0x025    0x25 // Unused Flag
-#define FLAG_UNUSED_0x026    0x26 // Unused Flag
-#define FLAG_UNUSED_0x027    0x27 // Unused Flag
-#define FLAG_UNUSED_0x028    0x28 // Unused Flag
+#define FLAG_LEVEL_CAP_1     0x20 // Level Cap Flag
+#define FLAG_LEVEL_CAP_2     0x21 // Level Cap Flag
+#define FLAG_LEVEL_CAP_4     0x22 // Level Cap Flag
+#define FLAG_LEVEL_CAP_8     0x23 // Level Cap Flag
+#define FLAG_LEVEL_CAP_16    0x24 // Level Cap Flag
+#define FLAG_LEVEL_CAP_32    0x25 // Level Cap Flag
+#define FLAG_LEVEL_CAP_64    0x26 // Level Cap Flag
+#define FLAG_IN_GAUNTLET     0x27 // Gauntlet Flag
+#define FLAG_REPELLENT_ON    0x28 // Repellent Flag
 #define FLAG_UNUSED_0x029    0x29 // Unused Flag
 #define FLAG_UNUSED_0x02A    0x2A // Unused Flag
 #define FLAG_UNUSED_0x02B    0x2B // Unused Flag

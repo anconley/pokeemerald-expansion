@@ -9814,4 +9814,50 @@ const struct Item gItems[] =
         .type = ITEM_USE_BAG_MENU,
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
     },
+
+    [ITEM_TRAINER_CARD] =
+    {
+        .name = _("Trainer Card"),
+        .price = 0,
+        .holdEffectParam = EXP_TRAINER_CARD,
+        .description = sTrainerCard,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_PARTY_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_RareCandy,
+    },
+
+    [ITEM_POKEHEAL] =
+    {
+        .name = _("PokéHeal"),
+        .price = 0,
+        .description = sFullRestoreDesc,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_PARTY_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_PokeHeal,
+    },
+
+    [ITEM_FAST_TRAVEL] =
+    {
+        .name = _("Fast Travel"),
+        .price = 0,
+        .description = sFastTravel,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_FastTravel,
+    },
+
+    [ITEM_REPELLENT] =
+    {
+        .name = _("Repellent"),
+        .price = 0,
+        .holdEffectParam = 6,
+        .description = sRepellent,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_Repellent,
+    }
 };
