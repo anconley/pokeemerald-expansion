@@ -1597,7 +1597,7 @@ void CB2_LinkError(void)
     InitHeap(gHeap, HEAP_SIZE);
     ResetSpriteData();
     FreeAllSpritePalettes();
-    ResetPaletteFadeControl();
+    ResetPaletteFade();
     SetBackdropFromColor(RGB_BLACK);
     ResetTasks();
     ScanlineEffect_Stop();
