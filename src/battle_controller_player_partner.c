@@ -300,25 +300,25 @@ static void PlayerPartnerHandleDrawTrainerPic(u32 battler)
     {
         trainerPicId = TRAINER_BACK_PIC_STEVEN;
         xPos = 90;
-        yPos = (8 - gTrainerBackPicCoords[trainerPicId].size) * 4 + 80;
+        yPos = 80;
     }
     else if (gPartnerTrainerId >= TRAINER_CUSTOM_PARTNER)
     {
         trainerPicId = gPartnerSpriteId;
         xPos = 90;
-        yPos = (8 - gTrainerBackPicCoords[trainerPicId].size) * 4 + 80;
+        yPos = 80;
     }
     else if (IsAiVsAiBattle())
     {
         trainerPicId = gTrainers[gPartnerTrainerId].trainerPic;
         xPos = 60;
-        yPos = (8 - gTrainerFrontPicCoords[trainerPicId].size) * 4 + 80;
+        yPos = 80;
     }
     else
     {
         trainerPicId = GetFrontierTrainerFrontSpriteId(gPartnerTrainerId);
         xPos = 32;
-        yPos = (8 - gTrainerFrontPicCoords[trainerPicId].size) * 4 + 80;
+        yPos = 80;
     }
 
     // Use back pic only if the partner is Steven or a custom partner.
@@ -440,9 +440,9 @@ static void PlayerPartnerHandleIntroTrainerBallThrow(u32 battler)
     const u32 *trainerPal;
 
     if (gPartnerTrainerId == TRAINER_STEVEN_PARTNER)
-        trainerPal = gTrainerBackPicPaletteTable[TRAINER_BACK_PIC_STEVEN].data;
+        trainerPal = gTrainerBackPicPaletteTable[TRAINER_BACK_PIC_STEVEN];
     else if (gPartnerTrainerId >= TRAINER_CUSTOM_PARTNER) // Custom multi battle.
-        trainerPal = gTrainerBackPicPaletteTable[gPartnerSpriteId].data;
+        trainerPal = gTrainerBackPicPaletteTable[gPartnerSpriteId];
     else if (IsAiVsAiBattle())
         trainerPal = gTrainerFrontPicPaletteTable[gTrainers[gPartnerTrainerId].trainerPic].data;
     else

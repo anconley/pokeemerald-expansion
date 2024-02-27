@@ -495,72 +495,72 @@ static const struct SpriteTemplate sTrainerBackSpriteTemplates[] =
 {
     [TRAINER_BACK_PIC_BRENDAN] = {
         .tileTag = TAG_NONE,
-        .paletteTag = 0,
+        .paletteTag = TRAINER_BACK_PIC_BRENDAN,
         .oam = &gOamData_BattleSpritePlayerSide,
-        .anims = NULL,
+        .anims = gBackAnims_4Frames,
         .images = gTrainerBackPicTable_Brendan,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
     [TRAINER_BACK_PIC_MAY] = {
         .tileTag = TAG_NONE,
-        .paletteTag = 0,
+        .paletteTag = TRAINER_BACK_PIC_MAY,
         .oam = &gOamData_BattleSpritePlayerSide,
-        .anims = NULL,
+        .anims = gBackAnims_4Frames,
         .images = gTrainerBackPicTable_May,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
     [TRAINER_BACK_PIC_RED] = {
         .tileTag = TAG_NONE,
-        .paletteTag = 0,
+        .paletteTag = TRAINER_BACK_PIC_RED,
         .oam = &gOamData_BattleSpritePlayerSide,
-        .anims = NULL,
+        .anims = gBackAnims_5Frames,
         .images = gTrainerBackPicTable_Red,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
     [TRAINER_BACK_PIC_LEAF] = {
         .tileTag = TAG_NONE,
-        .paletteTag = 0,
+        .paletteTag = TRAINER_BACK_PIC_LEAF,
         .oam = &gOamData_BattleSpritePlayerSide,
-        .anims = NULL,
+        .anims = gBackAnims_5Frames,
         .images = gTrainerBackPicTable_Leaf,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
     [TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN] = {
         .tileTag = TAG_NONE,
-        .paletteTag = 0,
+        .paletteTag = TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN,
         .oam = &gOamData_BattleSpritePlayerSide,
-        .anims = NULL,
+        .anims = gBackAnims_4Frames,
         .images = gTrainerBackPicTable_RubySapphireBrendan,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
     [TRAINER_BACK_PIC_RUBY_SAPPHIRE_MAY] = {
         .tileTag = TAG_NONE,
-        .paletteTag = 0,
+        .paletteTag = TRAINER_BACK_PIC_RUBY_SAPPHIRE_MAY,
         .oam = &gOamData_BattleSpritePlayerSide,
-        .anims = NULL,
+        .anims = gBackAnims_4Frames,
         .images = gTrainerBackPicTable_RubySapphireMay,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
     [TRAINER_BACK_PIC_WALLY] = {
         .tileTag = TAG_NONE,
-        .paletteTag = 0,
+        .paletteTag = TRAINER_BACK_PIC_WALLY,
         .oam = &gOamData_BattleSpritePlayerSide,
-        .anims = NULL,
+        .anims = gBackAnims_4Frames,
         .images = gTrainerBackPicTable_Wally,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
     [TRAINER_BACK_PIC_STEVEN] = {
         .tileTag = TAG_NONE,
-        .paletteTag = 0,
+        .paletteTag = TRAINER_BACK_PIC_STEVEN,
         .oam = &gOamData_BattleSpritePlayerSide,
-        .anims = NULL,
+        .anims = gBackAnims_4Frames,
         .images = gTrainerBackPicTable_Steven,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
@@ -1831,14 +1831,13 @@ void SetMultiuseSpriteTemplateToPokemon(u16 speciesTag, u8 battlerPosition)
 
 void SetMultiuseSpriteTemplateToTrainerBack(u16 trainerPicId, u8 battlerPosition)
 {
-    gMultiuseSpriteTemplate.paletteTag = trainerPicId;
     if (battlerPosition == B_POSITION_PLAYER_LEFT || battlerPosition == B_POSITION_PLAYER_RIGHT)
     {
         gMultiuseSpriteTemplate = sTrainerBackSpriteTemplates[trainerPicId];
-        gMultiuseSpriteTemplate.anims = gTrainerBackAnimsPtrTable[trainerPicId];
     }
     else
     {
+        gMultiuseSpriteTemplate.paletteTag = trainerPicId;
         if (gMonSpritesGfxPtr != NULL)
             gMultiuseSpriteTemplate = gMonSpritesGfxPtr->templates[battlerPosition];
         else
@@ -5236,10 +5235,6 @@ void SetWildMonHeldItem(void)
 {
     if (!(gBattleTypeFlags & (BATTLE_TYPE_LEGENDARY | BATTLE_TYPE_TRAINER | BATTLE_TYPE_PYRAMID | BATTLE_TYPE_PIKE)))
     {
-        u16 rnd;
-        u16 species;
-        u16 count = (WILD_DOUBLE_BATTLE) ? 2 : 1;
-        u16 i;
         bool32 itemHeldBoost = CanFirstMonBoostHeldItemRarity();
         u16 chanceNoItem = itemHeldBoost ? 20 : 45;
         u16 chanceNotRare = itemHeldBoost ? 80 : 95;
