@@ -2335,14 +2335,9 @@ static u8 UNUSED CameraObjectGetFollowedSpriteId(void)
 
 void CameraObjectReset2(void)
 {
-    // UB: Possible null dereference
-#ifdef UBFIX
     struct Sprite *camera = FindCameraSprite();
     if (camera)
         camera->sState = 2;
-#else
-    FindCameraSprite()->sState = 2;
-#endif // UBFIX
 }
 
 u8 CopySprite(struct Sprite *sprite, s16 x, s16 y, u8 subpriority)
@@ -2406,11 +2401,8 @@ const u8 *GetObjectEventScriptPointerByObjectEventId(u8 objectEventId)
 static u16 GetObjectEventFlagIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup)
 {
     const struct ObjectEventTemplate *obj = GetObjectEventTemplateByLocalIdAndMap(localId, mapNum, mapGroup);
-#ifdef UBFIX
-    // BUG: The function may return NULL, and attempting to read from NULL may freeze the game using modern compilers.
     if (obj == NULL)
         return 0;
-#endif // UBFIX
     return obj->flagId;
 }
 

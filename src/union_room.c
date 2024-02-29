@@ -1356,11 +1356,7 @@ static bool32 IsPartnerActivityAcceptable(u32 activity, u32 linkGroup)
     if (linkGroup == 0xFF)
         return TRUE;
 
-    #ifdef UBFIX
     if (linkGroup < ARRAY_COUNT(sAcceptedActivityIds))
-    #else
-    if (linkGroup <= ARRAY_COUNT(sAcceptedActivityIds))
-    #endif
     {
         const u8 *bytes = sAcceptedActivityIds[linkGroup];
 

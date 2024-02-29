@@ -4512,11 +4512,7 @@ static void UNUSED UnusedPrintMonName(u8 windowId, const u8 *name, u8 left, u8 t
         ;
     for (i = 0; i < nameLength; i++)
         str[ARRAY_COUNT(str) - nameLength + i] = name[i];
-#ifdef UBFIX
     str[ARRAY_COUNT(str) - 1] = EOS;
-#else
-    str[ARRAY_COUNT(str)] = EOS;
-#endif
     PrintInfoSubMenuText(windowId, str, left, top);
 }
 

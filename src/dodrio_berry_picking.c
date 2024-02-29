@@ -1966,9 +1966,7 @@ static void HandlePickBerries(void)
                 sGame->inputState[playerIdPicked] = INPUTSTATE_ATE_BERRY;
                 sGame->berryEatenBy[column] = playerIdPicked;
                 sGame->players[playerIdPicked].comm.ateBerry = TRUE;
-#ifdef UBFIX
                 if (playerIdMissed != PLAYER_NONE)
-#endif
                     sGame->players[playerIdMissed].comm.missedBerry = TRUE; // UB: playerIdMissed can be PLAYER_NONE here, which is out of bounds
 
                 sGame->berriesEaten[playerIdPicked]++;
@@ -4258,13 +4256,7 @@ static void UNUSED UnusedSetSpritePos(u8 spriteId)
     gSprites[spriteId].y = 50;
 }
 
-// Gamefreak made a mistake there and goes out of bounds for the data array as it holds 8 elements
-// in turn overwriting sprite's subpriority and subsprites fields.
-#ifdef UBFIX
-    #define sFrozen data[1]
-#else
-    #define sFrozen data[10]
-#endif // UBFIX
+#define sFrozen data[1]
 
 static void SpriteCB_Cloud(struct Sprite *sprite)
 {
