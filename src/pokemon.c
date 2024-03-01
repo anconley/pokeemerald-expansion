@@ -5205,14 +5205,14 @@ void SetMonPreventsSwitchingString(void)
     BattleStringExpandPlaceholders(gText_PkmnsXPreventsSwitching, gStringVar4);
 }
 
-static void SetWildMonHeldItemToPartySlot(u32 partySlot, u32 chanceNoItem, u32 chanceNotRare)
+void SetWildMonHeldItemToPartySlot(u32 partySlot, u32 chanceNoItem, u32 chanceNotRare)
 {
     struct Pokemon *enemyParty = &gEnemyParty[partySlot];
     u32 species = GetMonData(enemyParty, MON_DATA_SPECIES, 0);
     u32 itemCommon = gSpeciesInfo[species].itemCommon;
     u16 itemRare = gSpeciesInfo[species].itemRare;
     u16 rnd = Random() % 100;
-    if (gMapHeader.mapLayoutId == LAYOUT_ALTERING_CAVE)
+    if (gMapHeader.mapLayoutId == LAYOUT_ALTERING_CAVE || gMapHeader.mapLayoutId == LAYOUT_RG_SIX_ISLAND_ALTERING_CAVE)
     {
         u32 alteringCaveId = VarGet(VAR_ALTERING_CAVE_WILD_SET);
         if (alteringCaveId != 0 && alteringCaveId < ARRAY_COUNT(sAlteringCaveWildMonHeldItems))
@@ -5249,17 +5249,6 @@ static inline bool32 CanFirstMonBoostHeldItemRarity(void)
     else if ((OW_SUPER_LUCK == GEN_8) && GetMonAbility(&gPlayerParty[0]) == ABILITY_SUPER_LUCK)
         return TRUE;
     return FALSE;
-}
-
-void SetWildMonHeldItem(void)
-{
-    if (!(gBattleTypeFlags & (BATTLE_TYPE_LEGENDARY | BATTLE_TYPE_TRAINER | BATTLE_TYPE_PYRAMID | BATTLE_TYPE_PIKE)))
-    {
-        bool32 itemHeldBoost = CanFirstMonBoostHeldItemRarity();
-        u16 chanceNoItem = itemHeldBoost ? 20 : 45;
-        u16 chanceNotRare = itemHeldBoost ? 80 : 95;
-        SetWildMonHeldItemToPartySlot(0, chanceNoItem, chanceNotRare);
-    }
 }
 
 bool8 IsMonShiny(struct Pokemon *mon)

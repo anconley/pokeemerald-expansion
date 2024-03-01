@@ -901,13 +901,13 @@
 #define ITEM_SCANNER 737
 #define ITEM_STORAGE_KEY 738
 #define ITEM_KEY_TO_ROOM_1 739
-#define ITEM_RM_1_KEY ITEM_KEY_TO_ROOM_1 // Pre-Gen VI name
+#define ITEM_ROOM_1_KEY ITEM_KEY_TO_ROOM_1 // Pre-Gen VI name
 #define ITEM_KEY_TO_ROOM_2 740
-#define ITEM_RM_2_KEY ITEM_KEY_TO_ROOM_2 // Pre-Gen VI name
+#define ITEM_ROOM_2_KEY ITEM_KEY_TO_ROOM_2 // Pre-Gen VI name
 #define ITEM_KEY_TO_ROOM_4 741
-#define ITEM_RM_4_KEY ITEM_KEY_TO_ROOM_4 // Pre-Gen VI name
+#define ITEM_ROOM_4_KEY ITEM_KEY_TO_ROOM_4 // Pre-Gen VI name
 #define ITEM_KEY_TO_ROOM_6 742
-#define ITEM_RM_6_KEY ITEM_KEY_TO_ROOM_6 // Pre-Gen VI name
+#define ITEM_ROOM_6_KEY ITEM_KEY_TO_ROOM_6 // Pre-Gen VI name
 #define ITEM_METEORITE 743
 #define ITEM_MAGMA_EMBLEM 744
 #define ITEM_CONTEST_PASS 745
