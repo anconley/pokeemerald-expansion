@@ -77,8 +77,6 @@ static void PlayerNotOnBikeNotMoving(u8, u16);
 static void PlayerNotOnBikeTurningInPlace(u8, u16);
 static void PlayerNotOnBikeMoving(u8, u16);
 static u8 CheckForPlayerAvatarCollision(u8);
-static u8 CheckForPlayerAvatarStaticCollision(u8);
-static u8 CheckForObjectEventStaticCollision(struct ObjectEvent *, s16, s16, u8, u8);
 static bool8 CanStopSurfing(s16, s16, u8);
 static bool8 ShouldJumpLedge(s16, s16, u8);
 static bool8 TryPushBoulder(s16, s16, u8);
@@ -335,7 +333,7 @@ static bool8 TryInterruptObjectEventSpecialAnim(struct ObjectEvent *playerObjEve
                 return FALSE;
             }
 
-            if (CheckForPlayerAvatarStaticCollision(direction) == COLLISION_NONE)
+            if (CheckForPlayerAvatarCollision(direction) == COLLISION_NONE)
             {
                 ObjectEventClearHeldMovement(playerObjEvent);
                 return FALSE;
@@ -619,7 +617,6 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
         if (collision == COLLISION_LEDGE_JUMP)
         {
             PlayerJumpLedge(direction);
-            return;
         }
         else if (collision == COLLISION_DIRECTIONAL_STAIR_WARP)
         {
@@ -628,15 +625,14 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
         else if (collision == COLLISION_OBJECT_EVENT && IsPlayerCollidingWithFarawayIslandMew(direction))
         {
             PlayerNotOnBikeCollideWithFarawayIslandMew(direction);
-            return;
         }
         else
         {
             u8 adjustedCollision = collision - COLLISION_STOP_SURFING;
             if (adjustedCollision > 3)
                 PlayerNotOnBikeCollide(direction);
-            return;
         }
+        return;
     }
 
     if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_SURFING)
@@ -692,26 +688,13 @@ static u8 CheckForPlayerAvatarCollision(u8 direction)
 {
     s16 x, y;
     struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
-    u8 metatileBehavior;
 
     x = playerObjEvent->currentCoords.x;
     y = playerObjEvent->currentCoords.y;
-    metatileBehavior = MapGridGetMetatileBehaviorAt(x, y);
-    if (IsDirectionalStairWarpMetatileBehavior(metatileBehavior, direction))
+    if (IsDirectionalStairWarpMetatileBehavior(MapGridGetMetatileBehaviorAt(x, y), direction))
         return COLLISION_DIRECTIONAL_STAIR_WARP;
     MoveCoords(direction, &x, &y);
-    return CheckForObjectEventCollision(playerObjEvent, x, y, direction, metatileBehavior);
-}
-
-static u8 CheckForPlayerAvatarStaticCollision(u8 direction)
-{
-    s16 x, y;
-    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
-
-    x = playerObjEvent->currentCoords.x;
-    y = playerObjEvent->currentCoords.y;
-    MoveCoords(direction, &x, &y);
-    return CheckForObjectEventStaticCollision(playerObjEvent, x, y, direction, MapGridGetMetatileBehaviorAt(x, y));
+    return CheckForObjectEventCollision(playerObjEvent, x, y, direction, MapGridGetMetatileBehaviorAt(x, y));
 }
 
 u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 direction, u8 metatileBehavior)
@@ -731,19 +714,6 @@ u8 CheckForObjectEventCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u
     if (collision == COLLISION_NONE)
     {
         if (CheckForRotatingGatePuzzleCollision(direction, x, y))
-            return COLLISION_ROTATING_GATE;
-        CheckAcroBikeCollision(x, y, metatileBehavior, &collision);
-    }
-    return collision;
-}
-
-static u8 CheckForObjectEventStaticCollision(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 direction, u8 metatileBehavior)
-{
-    u8 collision = GetCollisionAtCoords(objectEvent, x, y, direction);
-
-    if (collision == COLLISION_NONE)
-    {
-        if (CheckForRotatingGatePuzzleCollisionWithoutAnimation(direction, x, y))
             return COLLISION_ROTATING_GATE;
         CheckAcroBikeCollision(x, y, metatileBehavior, &collision);
     }
@@ -1151,6 +1121,16 @@ static void PlayCollisionSoundIfNotFacingWarp(u8 direction)
 
     if (!sArrowWarpMetatileBehaviorChecks[direction - 1](metatileBehavior))
     {
+        if (direction == DIR_WEST)
+        {
+            if (metatileBehavior == MB_UP_LEFT_STAIR_WARP || metatileBehavior == MB_DOWN_LEFT_STAIR_WARP)
+                return;
+        }
+        if (direction == DIR_EAST)
+        {
+            if (metatileBehavior == MB_UP_RIGHT_STAIR_WARP || metatileBehavior == MB_DOWN_RIGHT_STAIR_WARP)
+                return;
+        }
         // Check if walking up into a door
         if (direction == DIR_NORTH)
         {
