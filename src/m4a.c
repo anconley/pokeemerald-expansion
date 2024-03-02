@@ -6,7 +6,8 @@ extern const u8 gCgb3Vol[];
 
 #define BSS_CODE __attribute__((section(".bss.code")))
 
-BSS_CODE ALIGNED(4) char SoundMainRAM_Buffer[0x800] = {0};
+BSS_CODE ALIGNED(4) char SoundMainRAM_Buffer[0xB40] = {0};
+BSS_CODE ALIGNED(4) u32 SoundMainRAM_MixBuffer[0xE0] = {0};
 
 struct SoundInfo gSoundInfo;
 struct PokemonCrySong gPokemonCrySongs[MAX_POKEMON_CRIES];
@@ -40,10 +41,6 @@ u32 MidiKeyToFreq(struct WaveData *wav, u8 key, u8 fineAdjust)
     val2 = gFreqTable[val2 & 0xF] >> (val2 >> 4);
 
     return umul3232H32(wav->freq, val1 + umul3232H32(val2 - val1, fineAdjustShifted));
-}
-
-void UnusedDummyFunc(void)
-{
 }
 
 void MPlayContinue(struct MusicPlayerInfo *mplayInfo)
@@ -100,11 +97,6 @@ void m4aSoundInit(void)
     }
 }
 
-void m4aSoundMain(void)
-{
-    SoundMain();
-}
-
 void m4aSongNumStart(u16 n)
 {
     const struct MusicPlayer *mplayTable = gMPlayTable;
@@ -136,21 +128,6 @@ void m4aSongNumStartOrChange(u16 n)
     }
 }
 
-void m4aSongNumStartOrContinue(u16 n)
-{
-    const struct MusicPlayer *mplayTable = gMPlayTable;
-    const struct Song *songTable = gSongTable;
-    const struct Song *song = &songTable[n];
-    const struct MusicPlayer *mplay = &mplayTable[song->ms];
-
-    if (mplay->info->songHeader != song->header)
-        MPlayStart(mplay->info, song->header);
-    else if ((mplay->info->status & MUSICPLAYER_STATUS_TRACK) == 0)
-        MPlayStart(mplay->info, song->header);
-    else if (mplay->info->status & MUSICPLAYER_STATUS_PAUSE)
-        MPlayContinue(mplay->info);
-}
-
 void m4aSongNumStop(u16 n)
 {
     const struct MusicPlayer *mplayTable = gMPlayTable;
@@ -160,17 +137,6 @@ void m4aSongNumStop(u16 n)
 
     if (mplay->info->songHeader == song->header)
         m4aMPlayStop(mplay->info);
-}
-
-void m4aSongNumContinue(u16 n)
-{
-    const struct MusicPlayer *mplayTable = gMPlayTable;
-    const struct Song *songTable = gSongTable;
-    const struct Song *song = &songTable[n];
-    const struct MusicPlayer *mplay = &mplayTable[song->ms];
-
-    if (mplay->info->songHeader == song->header)
-        MPlayContinue(mplay->info);
 }
 
 void m4aMPlayAllStop(void)
@@ -184,11 +150,6 @@ void m4aMPlayAllStop(void)
         m4aMPlayStop(&gPokemonCryMusicPlayers[i]);
 }
 
-void m4aMPlayContinue(struct MusicPlayerInfo *mplayInfo)
-{
-    MPlayContinue(mplayInfo);
-}
-
 void m4aMPlayAllContinue(void)
 {
     s32 i;
@@ -198,11 +159,6 @@ void m4aMPlayAllContinue(void)
 
     for (i = 0; i < MAX_POKEMON_CRIES; i++)
         MPlayContinue(&gPokemonCryMusicPlayers[i]);
-}
-
-void m4aMPlayFadeOut(struct MusicPlayerInfo *mplayInfo, u16 speed)
-{
-    MPlayFadeOut(mplayInfo, speed);
 }
 
 void m4aMPlayFadeOutTemporarily(struct MusicPlayerInfo *mplayInfo, u16 speed)

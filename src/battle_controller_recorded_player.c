@@ -249,7 +249,7 @@ static void Intro_TryShinyAnimShowHealthbox(u32 battler)
             if ((gBattleTypeFlags & BATTLE_TYPE_LINK) && (gBattleTypeFlags & BATTLE_TYPE_MULTI))
             {
                 if (GetBattlerPosition(battler) == B_POSITION_PLAYER_LEFT)
-                    m4aMPlayContinue(&gMPlayInfo_BGM);
+                    MPlayContinue(&gMPlayInfo_BGM);
             }
             else
             {

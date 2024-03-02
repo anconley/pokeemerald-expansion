@@ -7297,7 +7297,7 @@ static void Task_HandleCryScreenInput(u8 taskId)
         if (JOY_NEW(B_BUTTON))
         {
             BeginNormalPaletteFade(PALETTES_ALL & ~(0x14), 0, 0, 0x10, RGB_BLACK);
-            m4aMPlayContinue(&gMPlayInfo_BGM);
+            MPlayContinue(&gMPlayInfo_BGM);
             sPokedexView->screenSwitchState = 1;
             gTasks[taskId].func = Task_SwitchScreensFromCryScreen;
             PlaySE(SE_PC_OFF);
@@ -7307,7 +7307,7 @@ static void Task_HandleCryScreenInput(u8 taskId)
          || (JOY_NEW(L_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR))
         {
             BeginNormalPaletteFade(PALETTES_ALL & ~(0x14), 0, 0, 0x10, RGB_BLACK);
-            m4aMPlayContinue(&gMPlayInfo_BGM);
+            MPlayContinue(&gMPlayInfo_BGM);
             sPokedexView->screenSwitchState = 2;
             gTasks[taskId].func = Task_SwitchScreensFromCryScreen;
             PlaySE(SE_DEX_PAGE);
@@ -7323,7 +7323,7 @@ static void Task_HandleCryScreenInput(u8 taskId)
             else
             {
                 BeginNormalPaletteFade(PALETTES_ALL & ~(0x14), 0, 0, 0x10, RGB_BLACK);
-                m4aMPlayContinue(&gMPlayInfo_BGM);
+                MPlayContinue(&gMPlayInfo_BGM);
                 sPokedexView->screenSwitchState = 3;
                 gTasks[taskId].func = Task_SwitchScreensFromCryScreen;
                 PlaySE(SE_DEX_PAGE);
