@@ -884,7 +884,7 @@ static bool8 AllocPartyMenuBgGfx(void)
     case 1:
         if (!IsDma3ManagerBusyWithBgCopy())
         {
-            LZDecompressWram(gPartyMenuBg_Tilemap, sPartyBgTilemapBuffer);
+            LZ77UnCompWram(gPartyMenuBg_Tilemap, sPartyBgTilemapBuffer);
             sPartyMenuInternal->data[0]++;
         }
         break;
