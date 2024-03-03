@@ -108,9 +108,7 @@ void AgbMain()
     CheckForFlashMemory();
     InitMainCallbacks();
     InitMapMusic();
-#ifdef BUGFIX
-    SeedRngWithRtc(); // see comment at SeedRngWithRtc definition below
-#endif
+    SeedRngWithRtc();
     ClearDma3Requests();
     ResetBgs();
     SetDefaultFontsPointer();

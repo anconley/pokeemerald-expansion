@@ -42,6 +42,7 @@
 #include "constants/moves.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "field_player_avatar.h"
 
 // This file's functions.
 static void LoadContestPalettes(void);
@@ -2784,10 +2785,7 @@ void CreateContestMonFromParty(u8 partyIndex)
     if (gLinkContestFlags & LINK_CONTEST_FLAG_IS_LINK)
         StripPlayerNameForLinkContest(name);
     memcpy(gContestMons[gContestPlayerMonIndex].trainerName, name, PLAYER_NAME_LENGTH + 1);
-    if (gSaveBlock2Ptr->playerGender == MALE)
-        gContestMons[gContestPlayerMonIndex].trainerGfxId = OBJ_EVENT_GFX_LINK_BRENDAN;
-    else
-        gContestMons[gContestPlayerMonIndex].trainerGfxId = OBJ_EVENT_GFX_LINK_MAY;
+    gContestMons[gContestPlayerMonIndex].trainerGfxId = GetPlayerAvatarGraphicsIdByStateId(PLAYER_AVATAR_STATE_NORMAL);
     gContestMons[gContestPlayerMonIndex].aiFlags = 0;
     gContestMons[gContestPlayerMonIndex].highestRank = 0;
     gContestMons[gContestPlayerMonIndex].species = GetMonData(&gPlayerParty[partyIndex], MON_DATA_SPECIES);
@@ -6026,12 +6024,7 @@ static u8 GetMonNicknameLanguage(u8 *nickname)
                 || *nickname == CHAR_DBL_QUOTE_LEFT
                 || *nickname == CHAR_DBL_QUOTE_RIGHT
                 || *nickname == CHAR_SGL_QUOTE_LEFT
-#ifdef BUGFIX
-                || *nickname == CHAR_SGL_QUOTE_RIGHT
-#else
-                || *nickname == CHAR_DBL_QUOTE_LEFT // Most likely a typo, CHAR_SGL_QUOTE_RIGHT should be here instead.
-#endif
-                )
+                || *nickname == CHAR_SGL_QUOTE_RIGHT)
             {
                 nickname++;
             }
