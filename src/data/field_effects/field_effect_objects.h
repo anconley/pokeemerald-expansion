@@ -944,3 +944,20 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_Rayquaza = {
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = UpdateRayquazaSpotlightEffect,
 };
+
+static const struct SpriteFrameImage sPicTable_LongGrassCovered[] = {
+    overworld_frame(gFieldEffectObjectPic_LongGrassCovered, 2, 2, 0),
+    overworld_frame(gFieldEffectObjectPic_LongGrassCovered, 2, 2, 1),
+    overworld_frame(gFieldEffectObjectPic_LongGrassCovered, 2, 2, 2),
+    overworld_frame(gFieldEffectObjectPic_LongGrassCovered, 2, 2, 3),
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_LongGrassCovered = {
+    .tileTag = TAG_NONE,
+    .paletteTag = FLDEFF_PAL_TAG_GENERAL_1,
+    .oam = &gObjectEventBaseOam_16x16,
+    .anims = sAnimTable_LongGrass,
+    .images = sPicTable_LongGrassCovered,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLongGrassFieldEffect,
+};
