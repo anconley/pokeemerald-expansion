@@ -362,19 +362,6 @@ void SpriteCB_WaitForBattlerBallReleaseAnim(struct Sprite *sprite)
     }
 }
 
-static void UNUSED UnusedDoBattleSpriteAffineAnim(struct Sprite *sprite, bool8 pointless)
-{
-    sprite->animPaused = TRUE;
-    sprite->callback = SpriteCallbackDummy;
-
-    if (!pointless)
-        StartSpriteAffineAnim(sprite, 1);
-    else
-        StartSpriteAffineAnim(sprite, 1);
-
-    AnimateSprite(sprite);
-}
-
 #define sSpeedX data[0]
 
 void SpriteCB_TrainerSlideIn(struct Sprite *sprite)
@@ -649,32 +636,6 @@ void DecompressTrainerBackPic(u16 backPicId, u8 battler)
 void FreeTrainerFrontPicPalette(u16 frontPicId)
 {
     FreeSpritePaletteByTag(gTrainerFrontPicPaletteTable[frontPicId].tag);
-}
-
-// Unused.
-void BattleLoadAllHealthBoxesGfxAtOnce(void)
-{
-    u8 numberOfBattlers = 0;
-    u8 i;
-
-    LoadSpritePalette(&sSpritePalettes_HealthBoxHealthBar[0]);
-    LoadSpritePalette(&sSpritePalettes_HealthBoxHealthBar[1]);
-    if (!IsDoubleBattle())
-    {
-        LoadCompressedSpriteSheet(&sSpriteSheet_SinglesPlayerHealthbox);
-        LoadCompressedSpriteSheet(&sSpriteSheet_SinglesOpponentHealthbox);
-        numberOfBattlers = 2;
-    }
-    else
-    {
-        LoadCompressedSpriteSheet(&sSpriteSheets_DoublesPlayerHealthbox[0]);
-        LoadCompressedSpriteSheet(&sSpriteSheets_DoublesPlayerHealthbox[1]);
-        LoadCompressedSpriteSheet(&sSpriteSheets_DoublesOpponentHealthbox[0]);
-        LoadCompressedSpriteSheet(&sSpriteSheets_DoublesOpponentHealthbox[1]);
-        numberOfBattlers = MAX_BATTLERS_COUNT;
-    }
-    for (i = 0; i < numberOfBattlers; i++)
-        LoadCompressedSpriteSheet(&sSpriteSheets_HealthBar[GetBattlerPosition(i)]);
 }
 
 bool8 BattleLoadAllHealthBoxesGfx(u8 state)
@@ -1165,7 +1126,7 @@ void FillAroundBattleWindows(void)
 
     for (i = 0; i < 9; i++)
     {
-        for (j = 0; j < 16; j++)
+        for (j = 0; j < 16; vramPtr++, j++)
         {
             if (!(*vramPtr & 0xF000))
                 *vramPtr |= 0xF000;
@@ -1175,8 +1136,22 @@ void FillAroundBattleWindows(void)
                 *vramPtr |= 0x00F0;
             if (!(*vramPtr & 0x000F))
                 *vramPtr |= 0x000F;
-            vramPtr++;
         }
+    }
+
+    vramPtr = (u16 *)(VRAM + 0x600);
+    for (i = 0; i < 18; i++)
+    {
+        for (j = 0; j < 16; vramPtr++, j++)
+        {
+            if (!(*vramPtr & 0xF000))
+                *vramPtr |= 0x6000;
+            if (!(*vramPtr & 0x0F00))
+                *vramPtr |= 0x0600;
+            if (!(*vramPtr & 0x00F0))
+                *vramPtr |= 0x0060;
+            if (!(*vramPtr & 0x000F))
+                *vramPtr |= 0x0006;        }
     }
 }
 
@@ -1221,7 +1196,6 @@ void FreeMonSpritesGfx(void)
         return;
 
     TRY_FREE_AND_SET_NULL(gMonSpritesGfxPtr->buffer);
-    TRY_FREE_AND_SET_NULL(gMonSpritesGfxPtr->unusedPtr);
     FREE_AND_SET_NULL(gMonSpritesGfxPtr->barFontGfx);
     FREE_AND_SET_NULL(gMonSpritesGfxPtr->firstDecompressed);
     gMonSpritesGfxPtr->sprites.ptr[B_POSITION_PLAYER_LEFT] = NULL;
