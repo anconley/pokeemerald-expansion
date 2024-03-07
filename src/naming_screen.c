@@ -182,8 +182,8 @@ struct NamingScreenData
 
 EWRAM_DATA static struct NamingScreenData *sNamingScreen = NULL;
 
-static const u8 sPCIconOff_Gfx[] = INCBIN_U8("graphics/naming_screen/pc_icon_off.4bpp");
-static const u8 sPCIconOn_Gfx[] = INCBIN_U8("graphics/naming_screen/pc_icon_on.4bpp");
+static const u8 sPCIcon_Gfx[] = INCBIN_U8("graphics/naming_screen/pc_icon_off.4bpp",
+                                          "graphics/naming_screen/pc_icon_on.4bpp");
 static const u16 sKeyboard_Pal[] = INCBIN_U16("graphics/naming_screen/keyboard.gbapal");
 
 static const u8 *const sTransferredToPCMessages[] =
@@ -2298,8 +2298,7 @@ static const struct SubspriteTable sSubspriteTable_PCIcon[] =
 
 static const struct SpriteFrameImage sImageTable_PCIcon[] =
 {
-    {sPCIconOff_Gfx, sizeof(sPCIconOff_Gfx)},
-    {sPCIconOn_Gfx, sizeof(sPCIconOn_Gfx)},
+    overworld_ascending_frames(sPCIcon_Gfx, 2, 3),
 };
 
 static const union AnimCmd sAnim_Loop[] =
