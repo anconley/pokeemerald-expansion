@@ -29,4 +29,16 @@ void PlayerFaceTrainerAfterBattle(void);
 u8 FldEff_DoubleExclMarkIcon(void);
 u8 FldEff_XIcon(void);
 
+enum
+{
+    EMOTE_EXCLAMATION_MARK,
+    EMOTE_QUESTION_MARK,
+    EMOTE_HEART,
+    EMOTE_DOUBLE_EXCL_MARK,
+    EMOTE_X,
+    EMOTE_COUNT
+};
+
+extern const u16 gEmoteIdToFldEffId[EMOTE_COUNT];
+
 #endif // GUARD_TRAINER_SEE_H
