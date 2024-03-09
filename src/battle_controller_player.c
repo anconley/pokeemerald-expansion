@@ -1900,6 +1900,9 @@ static void PlayerHandleDrawTrainerPic(u32 battler)
     }
     else // Use back pic in all the other usual circumstances.
     {
+        trainerPicId = PlayerGenderToBackTrainerPicId(gSaveBlock2Ptr->playerGender);
+        if (gBattleTypeFlags & BATTLE_TYPE_LINK)
+            trainerPicId = GetLinkPlayerBackTrainerPicId(GetMultiplayerId());
         isFrontPic = FALSE;
     }
 
@@ -1908,7 +1911,9 @@ static void PlayerHandleDrawTrainerPic(u32 battler)
 
 static void PlayerHandleTrainerSlide(u32 battler)
 {
-    u32 trainerPicId = PlayerGetTrainerBackPicId();
+    u32 trainerPicId = PlayerGenderToBackTrainerPicId(gSaveBlock2Ptr->playerGender);
+    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
+        trainerPicId = GetLinkPlayerBackTrainerPicId(GetMultiplayerId());
     BtlController_HandleTrainerSlide(battler, trainerPicId);
 }
 
@@ -2232,8 +2237,9 @@ static void PlayerHandleOneReturnValue_Duplicate(u32 battler)
 
 static void PlayerHandleIntroTrainerBallThrow(u32 battler)
 {
+    u32 trainerPicId = PlayerGenderToBackTrainerPicId(gSaveBlock2Ptr->playerGender);
     const u32 *trainerPal = gTrainerBackPicPaletteTable[gSaveBlock2Ptr->playerGender];
-    BtlController_HandleIntroTrainerBallThrow(battler, 0xD6F8, trainerPal, 31, Intro_TryShinyAnimShowHealthbox);
+    BtlController_HandleIntroTrainerBallThrow(battler, trainerPicId, trainerPal, 31, Intro_TryShinyAnimShowHealthbox);
 }
 
 static void PlayerHandleDrawPartyStatusSummary(u32 battler)

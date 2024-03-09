@@ -55,6 +55,7 @@
 #include "constants/union_room.h"
 #include "constants/weather.h"
 #include "region_map.h"
+#include "trainer_pokemon_sprites.h"
 
 #if P_FRIENDSHIP_EVO_THRESHOLD >= GEN_9
 #define FRIENDSHIP_EVO_THRESHOLD 160
@@ -5463,10 +5464,7 @@ u16 FacilityClassToPicIndex(u16 facilityClass)
 
 u16 PlayerGenderToFrontTrainerPicId(u8 playerGender)
 {
-    if (playerGender != MALE)
-        return FacilityClassToPicIndex(FACILITY_CLASS_MAY);
-    else
-        return FacilityClassToPicIndex(FACILITY_CLASS_BRENDAN);
+    return GetPlayerFrontTrainerPicId(GAME_VERSION, playerGender);
 }
 
 void HandleSetPokedexFlag(u16 nationalNum, u8 caseId, u32 personality)
@@ -5629,6 +5627,11 @@ u8 *MonSpritesGfxManager_GetSpritePtr(void)
     {
         return gfx->spritePointers[B_POSITION_OPPONENT_LEFT];
     }
+}
+
+u8 PlayerGenderToBackTrainerPicId(u8 playerGender)
+{
+    return GetPlayerBackTrainerPicId(GAME_VERSION, playerGender);
 }
 
 u16 GetFormSpeciesId(u16 speciesId, u8 formId)
