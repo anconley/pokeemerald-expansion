@@ -219,7 +219,7 @@ static bool8 (*const sArrowWarpMetatileBehaviorChecks[])(u8) =
     [DIR_EAST - 1]  = MetatileBehavior_IsEastArrowWarp,
 };
 
-static const u8 sPlayerAvatarGfxIds[][2] =
+static const u16 sPlayerAvatarGfxIds[][2] =
 {
     [PLAYER_AVATAR_STATE_NORMAL]     = {OBJ_EVENT_GFX_BRENDAN_NORMAL,     OBJ_EVENT_GFX_MAY_NORMAL},
     [PLAYER_AVATAR_STATE_BIKE]       = {OBJ_EVENT_GFX_BRENDAN_BIKE,       OBJ_EVENT_GFX_MAY_BIKE},
@@ -228,7 +228,7 @@ static const u8 sPlayerAvatarGfxIds[][2] =
     [PLAYER_AVATAR_STATE_VSSEEKER]   = {OBJ_EVENT_GFX_BRENDAN_FIELD_MOVE, OBJ_EVENT_GFX_MAY_FIELD_MOVE},
 };
 
-static const u8 sPlayerAvatarAnimGfxIds[][2] =
+static const u16 sPlayerAvatarAnimGfxIds[][2] =
 {
     [PLAYER_AVATAR_GFX_FIELD_MOVE] = {OBJ_EVENT_GFX_BRENDAN_FIELD_MOVE, OBJ_EVENT_GFX_MAY_FIELD_MOVE},
     [PLAYER_AVATAR_GFX_FISHING]    = {OBJ_EVENT_GFX_BRENDAN_FISHING,    OBJ_EVENT_GFX_MAY_FISHING},
@@ -1225,14 +1225,14 @@ void StopPlayerAvatar(void)
     }
 }
 
-u8 GetPlayerAvatarGraphicsIdByStateIdAndGender(u8 state, u8 gender)
+u16 GetPlayerAvatarGraphicsIdByStateIdAndGender(u8 state, u8 gender)
 {
     return sPlayerAvatarGfxIds[state][gender];
 }
 
-u8 GetLinkPlayerAvatarGraphicsIdByGender(u8 version, u8 gender)
+u16 GetLinkPlayerAvatarGraphicsIdByGender(u8 version, u8 gender)
 {
-    u8 gfxId = sPlayerAvatarGfxIds[PLAYER_AVATAR_STATE_NORMAL][gender];
+    u16 gfxId = sPlayerAvatarGfxIds[PLAYER_AVATAR_STATE_NORMAL][gender];
     switch (GetVersionId(version))
     {
     case 2:
@@ -1245,7 +1245,7 @@ u8 GetLinkPlayerAvatarGraphicsIdByGender(u8 version, u8 gender)
     return gfxId;
 }
 
-u8 GetPlayerAvatarGraphicsIdByStateId(u8 state)
+u16 GetPlayerAvatarGraphicsIdByStateId(u8 state)
 {
     return GetPlayerAvatarGraphicsIdByStateIdAndGender(state, gSaveBlock2Ptr->playerGender);
 }
@@ -1301,7 +1301,7 @@ void SetPlayerAvatarStateMask(u8 flags)
     gPlayerAvatar.flags |= flags;
 }
 
-static u8 GetPlayerAvatarStateTransitionByGraphicsId(u8 graphicsId)
+static u8 GetPlayerAvatarStateTransitionByGraphicsId(u16 graphicsId)
 {
     u32 i;
 
@@ -1313,7 +1313,7 @@ static u8 GetPlayerAvatarStateTransitionByGraphicsId(u8 graphicsId)
     return PLAYER_AVATAR_FLAG_ON_FOOT;
 }
 
-u8 GetPlayerAvatarGraphicsIdByCurrentState(void)
+u16 GetPlayerAvatarGraphicsIdByCurrentState(void)
 {
     u32 i;
     u8 flags = gPlayerAvatar.flags;
@@ -1326,7 +1326,7 @@ u8 GetPlayerAvatarGraphicsIdByCurrentState(void)
     return 0;
 }
 
-void SetPlayerAvatarExtraStateTransition(u8 graphicsId, u8 transitionFlag)
+void SetPlayerAvatarExtraStateTransition(u16 graphicsId, u8 transitionFlag)
 {
     u8 stateFlag = GetPlayerAvatarStateTransitionByGraphicsId(graphicsId);
 
@@ -1344,12 +1344,12 @@ void InitPlayerAvatar(s16 x, s16 y, u8 direction)
     playerObjEventTemplate.graphicsId = GetPlayerAvatarGraphicsIdByStateId(PLAYER_AVATAR_STATE_NORMAL);
     playerObjEventTemplate.x = x - MAP_OFFSET;
     playerObjEventTemplate.y = y - MAP_OFFSET;
-    playerObjEventTemplate.elevation = 0;
-    playerObjEventTemplate.movementType = MOVEMENT_TYPE_PLAYER;
-    playerObjEventTemplate.movementRangeX = 0;
-    playerObjEventTemplate.movementRangeY = 0;
-    playerObjEventTemplate.trainerType = TRAINER_TYPE_NONE;
-    playerObjEventTemplate.trainerRange_berryTreeId = 0;
+    playerObjEventTemplate.objUnion.normal.elevation = 0;
+    playerObjEventTemplate.objUnion.normal.movementType = MOVEMENT_TYPE_PLAYER;
+    playerObjEventTemplate.objUnion.normal.movementRangeX = 0;
+    playerObjEventTemplate.objUnion.normal.movementRangeY = 0;
+    playerObjEventTemplate.objUnion.normal.trainerType = TRAINER_TYPE_NONE;
+    playerObjEventTemplate.objUnion.normal.trainerRange_berryTreeId = 0;
     playerObjEventTemplate.script = NULL;
     playerObjEventTemplate.flagId = 0;
     objectEventId = SpawnSpecialObjectEvent(&playerObjEventTemplate);
@@ -1374,7 +1374,7 @@ void SetPlayerInvisibility(bool8 invisible)
 
 static void SetPlayerAvatarAnimation(u32 playerAnimId, u32 animNum)
 {
-    u8 gfxId = sPlayerAvatarAnimGfxIds[playerAnimId][gSaveBlock2Ptr->playerGender];
+    u16 gfxId = sPlayerAvatarAnimGfxIds[playerAnimId][gSaveBlock2Ptr->playerGender];
     ObjectEventSetGraphicsId(&gObjectEvents[gPlayerAvatar.objectEventId], gfxId);
     StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], animNum);
 }

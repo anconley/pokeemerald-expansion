@@ -1384,7 +1384,7 @@ static void NamingScreen_NoIcon(void)
 
 }
 
-static void NamingScreen_CreateObjectEventIcon(u8 gfxId)
+static void NamingScreen_CreateObjectEventIcon(u16 gfxId)
 {
     u8 spriteId;
 

@@ -167,6 +167,10 @@ static void DestroyLevitateMovementTask(u8);
 static bool8 NpcTakeStep(struct Sprite *);
 static bool8 IsElevationMismatchAt(u8, s16, s16);
 static bool8 AreElevationsCompatible(u8, u8);
+static bool8 ShouldInitObjectEventStateFromTemplate(const struct ObjectEventTemplate *, bool8, s16, s16);
+static bool8 TemplateIsObstacleAndWithinView(const struct ObjectEventTemplate *, s16, s16);
+static bool8 TemplateIsObstacleAndVisibleFromConnectingMap(const struct ObjectEventTemplate *);
+static void SetHideObstacleFlag(const struct ObjectEventTemplate *);
 
 static const struct SpriteFrameImage sPicTable_PechaBerryTree[];
 
@@ -1054,36 +1058,53 @@ static u8 InitObjectEventStateFromTemplate(const struct ObjectEventTemplate *tem
 {
     struct ObjectEvent *objectEvent;
     u8 objectEventId;
-    s16 x;
-    s16 y;
+    s16 x = 0;
+    s16 y = 0;
+    bool8 isClone = FALSE;
+
+    if (template->kind == OBJ_KIND_CLONE)
+    {
+        isClone = TRUE;
+        mapNum = template->objUnion.clone.targetMapNum;
+        mapGroup = template->objUnion.clone.targetMapGroup;
+        x = template->x;
+        y = template->y;
+        template = &Overworld_GetMapHeaderByGroupAndId(mapGroup, mapNum)->events->objectEvents[template->objUnion.clone.targetLocalId - 1];
+    }
 
     if (GetAvailableObjectEventId(template->localId, mapNum, mapGroup, &objectEventId))
         return OBJECT_EVENTS_COUNT;
+
+    if (!ShouldInitObjectEventStateFromTemplate(template, isClone, x, y))
+        return OBJECT_EVENTS_COUNT;
+
     objectEvent = &gObjectEvents[objectEventId];
     ClearObjectEvent(objectEvent);
-    x = template->x + MAP_OFFSET;
-    y = template->y + MAP_OFFSET;
+    if (!isClone)
+    {
+        x = template->x;
+        y = template->y;
+    }
     objectEvent->active = TRUE;
     objectEvent->triggerGroundEffectsOnMove = TRUE;
     objectEvent->graphicsId = template->graphicsId;
-    objectEvent->movementType = template->movementType;
+    objectEvent->movementType = template->objUnion.normal.movementType;
     objectEvent->localId = template->localId;
     objectEvent->mapNum = mapNum;
     objectEvent->mapGroup = mapGroup;
-    objectEvent->initialCoords.x = x;
-    objectEvent->initialCoords.y = y;
-    objectEvent->currentCoords.x = x;
-    objectEvent->currentCoords.y = y;
-    objectEvent->previousCoords.x = x;
-    objectEvent->previousCoords.y = y;
-    objectEvent->currentElevation = template->elevation;
-    objectEvent->previousElevation = template->elevation;
-    objectEvent->rangeX = template->movementRangeX;
-    objectEvent->rangeY = template->movementRangeY;
-    objectEvent->trainerType = template->trainerType;
-    objectEvent->mapNum = mapNum;
-    objectEvent->trainerRange_berryTreeId = template->trainerRange_berryTreeId;
-    objectEvent->previousMovementDirection = gInitialMovementTypeFacingDirections[template->movementType];
+    objectEvent->initialCoords.x = x + MAP_OFFSET;
+    objectEvent->initialCoords.y = y + MAP_OFFSET;
+    objectEvent->currentCoords.x = objectEvent->initialCoords.x;
+    objectEvent->currentCoords.y = objectEvent->initialCoords.y;
+    objectEvent->previousCoords.x = objectEvent->initialCoords.x;
+    objectEvent->previousCoords.y = objectEvent->initialCoords.y;
+    objectEvent->currentElevation = template->objUnion.normal.elevation;
+    objectEvent->previousElevation = objectEvent->currentElevation;
+    objectEvent->rangeX = template->objUnion.normal.movementRangeX;
+    objectEvent->rangeY = template->objUnion.normal.movementRangeY;
+    objectEvent->trainerType = template->objUnion.normal.trainerType;
+    objectEvent->trainerRange_berryTreeId = template->objUnion.normal.trainerRange_berryTreeId;
+    objectEvent->previousMovementDirection = gInitialMovementTypeFacingDirections[objectEvent->movementType];
     SetObjectEventDirection(objectEvent, objectEvent->previousMovementDirection);
     SetObjectEventDynamicGraphicsId(objectEvent);
     if (sMovementTypeHasRange[objectEvent->movementType])
@@ -1119,6 +1140,83 @@ u8 Unref_TryInitLocalObjectEvent(u8 localId)
         }
     }
     return OBJECT_EVENTS_COUNT;
+}
+
+static bool8 ShouldInitObjectEventStateFromTemplate(const struct ObjectEventTemplate *template, bool8 isClone, s16 x, s16 y)
+{
+    if (isClone && !TemplateIsObstacleAndWithinView(template, x, y))
+        return FALSE;
+
+    if (!TemplateIsObstacleAndVisibleFromConnectingMap(template))
+        return FALSE;
+
+    return TRUE;
+}
+
+static bool8 TemplateIsObstacleAndWithinView(const struct ObjectEventTemplate *template, s16 x, s16 y)
+{
+    if (template->graphicsId == OBJ_EVENT_GFX_CUTTABLE_TREE || template->graphicsId == OBJ_EVENT_GFX_BREAKABLE_ROCK)
+    {
+        if (gSaveBlock1Ptr->pos.x < x)
+        {
+            if (gSaveBlock1Ptr->pos.x + (MAP_OFFSET + 1) < x)
+                return TRUE;
+            if (gSaveBlock1Ptr->pos.y - (MAP_OFFSET - 1) <= y && gSaveBlock1Ptr->pos.y + (MAP_OFFSET - 1) >= y)
+                return FALSE;
+        }
+        else 
+        {
+            if (gSaveBlock1Ptr->pos.x - (MAP_OFFSET + 1) > x)
+                return TRUE;
+
+            if (gSaveBlock1Ptr->pos.y - (MAP_OFFSET - 1) <= y && gSaveBlock1Ptr->pos.y + (MAP_OFFSET - 1) >= y)
+                return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+static bool8 TemplateIsObstacleAndVisibleFromConnectingMap(const struct ObjectEventTemplate *template)
+{
+    if (IsMapTypeOutdoors(GetCurrentMapType()))
+    {
+        s32 width = gBackupMapLayout.width - MAP_OFFSET_W - 1;
+        s32 height = gBackupMapLayout.height - MAP_OFFSET_H - 1;
+
+        if (template->graphicsId == OBJ_EVENT_GFX_CUTTABLE_TREE || template->graphicsId == OBJ_EVENT_GFX_BREAKABLE_ROCK)
+        {
+            if (gSaveBlock1Ptr->pos.x == 0 && template->x <= (MAP_OFFSET + 1))
+            {
+                SetHideObstacleFlag(template);
+                return FALSE;
+            }
+
+            if (gSaveBlock1Ptr->pos.x == width && template->x >= width - (MAP_OFFSET + 1))
+            {
+                SetHideObstacleFlag(template);
+                return FALSE;
+            }
+
+            if (gSaveBlock1Ptr->pos.y == 0 && template->y <= (MAP_OFFSET - 1))
+            {
+                SetHideObstacleFlag(template);
+                return FALSE;
+            }
+
+            if (gSaveBlock1Ptr->pos.y == height && template->y >= height - (MAP_OFFSET - 1))
+            {
+                SetHideObstacleFlag(template);
+                return FALSE;
+            }
+        }
+    }
+    return TRUE;
+}
+
+static void SetHideObstacleFlag(const struct ObjectEventTemplate *template)
+{
+    if (template->flagId >= FLAG_TEMP_11 && template->flagId <= FLAG_TEMP_1F)
+        FlagSet(template->flagId);
 }
 
 static bool8 GetAvailableObjectEventId(u16 localId, u8 mapNum, u8 mapGroup, u8 *objectEventId)
@@ -1283,7 +1381,7 @@ u8 SpawnSpecialObjectEvent(struct ObjectEventTemplate *objectEventTemplate)
     return TrySpawnObjectEventTemplate(objectEventTemplate, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, cameraX, cameraY);
 }
 
-u8 SpawnSpecialObjectEventParameterized(u8 graphicsId, u8 movementBehavior, u8 localId, s16 x, s16 y, u8 elevation)
+u8 SpawnSpecialObjectEventParameterized(u16 graphicsId, u8 movementBehavior, u8 localId, s16 x, s16 y, u8 elevation)
 {
     struct ObjectEventTemplate objectEventTemplate;
 
@@ -1294,12 +1392,12 @@ u8 SpawnSpecialObjectEventParameterized(u8 graphicsId, u8 movementBehavior, u8 l
     objectEventTemplate.kind = OBJ_KIND_NORMAL;
     objectEventTemplate.x = x;
     objectEventTemplate.y = y;
-    objectEventTemplate.elevation = elevation;
-    objectEventTemplate.movementType = movementBehavior;
-    objectEventTemplate.movementRangeX = 0;
-    objectEventTemplate.movementRangeY = 0;
-    objectEventTemplate.trainerType = TRAINER_TYPE_NONE;
-    objectEventTemplate.trainerRange_berryTreeId = 0;
+    objectEventTemplate.objUnion.normal.elevation = elevation;
+    objectEventTemplate.objUnion.normal.movementType = movementBehavior;
+    objectEventTemplate.objUnion.normal.movementRangeX = 0;
+    objectEventTemplate.objUnion.normal.movementRangeY = 0;
+    objectEventTemplate.objUnion.normal.trainerType = TRAINER_TYPE_NONE;
+    objectEventTemplate.objUnion.normal.trainerRange_berryTreeId = 0;
     return SpawnSpecialObjectEvent(&objectEventTemplate);
 }
 
@@ -1337,7 +1435,7 @@ static void CopyObjectGraphicsInfoToSpriteTemplate_WithMovementType(u16 graphics
 
 static void MakeSpriteTemplateFromObjectEventTemplate(const struct ObjectEventTemplate *objectEventTemplate, struct SpriteTemplate *spriteTemplate, const struct SubspriteTable **subspriteTables)
 {
-    CopyObjectGraphicsInfoToSpriteTemplate_WithMovementType(objectEventTemplate->graphicsId, objectEventTemplate->movementType, spriteTemplate, subspriteTables);
+    CopyObjectGraphicsInfoToSpriteTemplate_WithMovementType(objectEventTemplate->graphicsId, objectEventTemplate->objUnion.normal.movementType, spriteTemplate, subspriteTables);
 }
 
 // Used to create a sprite using a graphicsId associated with object events.
@@ -1374,7 +1472,7 @@ u8 CreateObjectGraphicsSprite(u16 graphicsId, void (*callback)(struct Sprite *),
 // A unique id is given as an argument and stored in the sprite data to allow referring back to the same virtual object.
 // They can be turned (and, in the case of the Union Room, animated teleporting in and out) but do not have movement types
 // or any of the other data normally associated with object events.
-u8 CreateVirtualObject(u8 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevation, u8 direction)
+u8 CreateVirtualObject(u16 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevation, u8 direction)
 {
     u8 spriteId;
     struct Sprite *sprite;
@@ -1578,7 +1676,7 @@ static void SetPlayerAvatarObjectEventIdAndObjectId(u8 objectEventId, u8 spriteI
     SetPlayerAvatarExtraStateTransition(gObjectEvents[objectEventId].graphicsId, PLAYER_AVATAR_FLAG_CONTROLLABLE);
 }
 
-void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u8 graphicsId)
+void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u16 graphicsId)
 {
     const struct ObjectEventGraphicsInfo *graphicsInfo;
     struct Sprite *sprite;
@@ -1607,7 +1705,7 @@ void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u8 graphicsId)
         CameraObjectReset1();
 }
 
-void ObjectEventSetGraphicsIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup, u8 graphicsId)
+void ObjectEventSetGraphicsIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup, u16 graphicsId)
 {
     u8 objectEventId;
 
@@ -1664,7 +1762,7 @@ static void SetBerryTreeGraphics(struct ObjectEvent *objectEvent, struct Sprite 
     }
 }
 
-const struct ObjectEventGraphicsInfo *GetObjectEventGraphicsInfo(u8 graphicsId)
+const struct ObjectEventGraphicsInfo *GetObjectEventGraphicsInfo(u16 graphicsId)
 {
     u8 bard;
 
@@ -2147,7 +2245,7 @@ void TryOverrideTemplateCoordsForObjectEvent(const struct ObjectEvent *objectEve
 
     objectEventTemplate = GetBaseTemplateForObjectEvent(objectEvent);
     if (objectEventTemplate != NULL)
-        objectEventTemplate->movementType = movementType;
+        objectEventTemplate->objUnion.normal.movementType = movementType;
 }
 
 void TryOverrideObjectEventTemplateCoords(u8 localId, u8 mapNum, u8 mapGroup)
@@ -7487,7 +7585,7 @@ void TurnVirtualObject(u8 virtualObjId, u8 direction)
         StartSpriteAnim(&gSprites[spriteId], GetFaceDirectionAnimNum(direction));
 }
 
-void SetVirtualObjectGraphics(u8 virtualObjId, u8 graphicsId)
+void SetVirtualObjectGraphics(u8 virtualObjId, u16 graphicsId)
 {
     int spriteId = GetVirtualObjectSpriteId(virtualObjId);
 
