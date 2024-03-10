@@ -2746,7 +2746,7 @@ static void VBlankCB_FieldMoveShowMonOutdoors(void)
 
 static void LoadFieldMoveOutdoorStreaksTilemap(u16 offs)
 {
-    u16 i;
+    u32 i;
     u16 *dest;
     dest = (u16 *)(VRAM + ARRAY_COUNT(sFieldMoveStreaksOutdoors_Tilemap) + offs);
     for (i = 0; i < ARRAY_COUNT(sFieldMoveStreaksOutdoors_Tilemap); i++, dest++)
@@ -2878,7 +2878,7 @@ static void AnimateIndoorShowMonBg(struct Task *task)
 
 static bool8 SlideIndoorBannerOnscreen(struct Task *task)
 {
-    u16 i;
+    u32 i;
     u16 srcOffs;
     u16 dstOffs;
     u16 *dest;
@@ -2907,7 +2907,7 @@ static bool8 SlideIndoorBannerOnscreen(struct Task *task)
 
 static bool8 SlideIndoorBannerOffscreen(struct Task *task)
 {
-    u16 i;
+    u32 i;
     u16 dstOffs;
     u16 *dest;
 
