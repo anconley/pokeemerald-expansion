@@ -34,38 +34,57 @@ struct MonCoords
 #define TRAINER_PARTY_IVS(hp, atk, def, speed, spatk, spdef) (hp | (atk << 5) | (def << 10) | (speed << 15) | (spatk << 20) | (spdef << 25))
 #define TRAINER_PARTY_EVS(hp, atk, def, speed, spatk, spdef) ((const u8[6]){hp,atk,def,spatk,spdef,speed})
 #define TRAINER_PARTY_NATURE(nature) (nature+1)
+#define TRAINER_PARTY_GENDER(gender) (gender+1)
 
 struct TrainerMon
 {
-    const u8 *nickname;
-    const u8 *ev;
     u32 iv;
-    u16 moves[4];
+    u8 lvl;
+    bool8 gender:2;
+    bool8 isShiny:1;
+    bool8 abilityNum:1;
     u16 species;
     u16 heldItem;
-    u16 ability;
-    u8 lvl;
-    u8 ball;
-    u8 friendship;
-    u8 nature : 5;
-    bool8 gender : 2;
-    bool8 isShiny : 1;
+    u16 moves[MAX_MON_MOVES];
+    u16 nature:11;
+    u16 pokeball:5;
+    const u8 *ev;
 };
 
 #define TRAINER_PARTY(partyArray) partyArray, .partySize = ARRAY_COUNT(partyArray)
 
 struct Trainer
 {
-    /*0x00*/ u32 aiFlags;
-    /*0x04*/ const struct TrainerMon *party;
-    /*0x08*/ u16 items[MAX_TRAINER_ITEMS];
-    /*0x10*/ u8 trainerClass;
-    /*0x11*/ u8 encounterMusic_gender; // last bit is gender
-    /*0x12*/ u8 trainerPic;
-    /*0x13*/ u8 trainerName[TRAINER_NAME_LENGTH + 1];
-    /*0x1E*/ bool8 doubleBattle:1;
-             u8 padding:7;
-    /*0x1F*/ u8 partySize;
+    /*0x00*/ u8 partySize:7;
+             bool8 doubleBattle:1;
+    /*0x01*/ u8 trainerClass;
+    /*0x02*/ u8 encounterMusic_gender; // last bit is gender
+    /*0x03*/ u8 trainerPic;
+    /*0x04*/ u8 trainerName[TRAINER_NAME_LENGTH + 1];
+    union
+    {
+        struct
+        {
+            /*0x08*/ u16 items[MAX_TRAINER_ITEMS];
+            /*0x10*/ u32 aiFlags;
+        } trainer;
+        struct
+        {
+            /*0x08*/ u32 otId;
+            /*0x0C*/ u8 padding[4];
+            /*0x10*/ u32 aiFlags;
+        } partner;
+        struct
+        {
+            /*0x08*/ u8 streakAppearances[4];
+            // Flags to change the conversation when the Frontier Brain is encountered for a battle
+            // First bit is has battled them before and not won yet, second bit is has battled them and won (obtained a Symbol)
+            /*0x0C*/ u16 battledBrainBitFlags[2];
+            /*0x10*/ u8 objectEventGfxId;
+            /*0x11*/ u8 padding[3];
+        } frontierBrain;
+    } trainerType;
+    /*0x14*/ const struct TrainerMon *party;
 };
 
 #define TRAINER_ENCOUNTER_MUSIC(trainer)((gTrainers[trainer].encounterMusic_gender & 0x7F))
@@ -105,5 +124,10 @@ extern const u8 gTrainerClassNames[][13];
 extern const u8 gMoveNames[MOVES_COUNT_DYNAMAX][MOVE_NAME_LENGTH + 1];
 extern const u8 *const gZMoveNames[];
 extern const u8 *const gMaxMoveNames[];
+
+#include "trainer_control.h"
+
+extern const struct Trainer gPartners[];
+extern const struct Trainer gFrontierBrains[];
 
 #endif // GUARD_DATA_H

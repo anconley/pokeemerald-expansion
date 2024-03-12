@@ -163,3 +163,10 @@
 	special SavePlayerParty
 	multi_do_fixed MULTI_BATTLE_2_VS_WILD, \partnerId, \partnerPicId
 	.endm
+
+	.macro trainerbattle_multi trainerA:req, lose_textA:req, trainerB:req, lose_textB:req, partner:req
+	trainerbattle_set_trainer_A \trainerA, \lose_textA
+	trainerbattle_set_trainer_B \trainerB, \lose_textB
+	setpartner TRAINER_PARTNER(\partner)
+	call EventScript_DoMultiBattle
+	.endm

@@ -342,6 +342,7 @@ SECTIONS {
         src/gym_leader_rematch.o(.text);
         src/battle_transition_frontier.o(.text);
         src/international_string_util.o(.text);
+        src/trainer_control.o(.text);
         src/pokemon_debug.o(.text);
         src/expansion_intro.o(.text);
     } > ROM =0

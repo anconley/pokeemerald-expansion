@@ -7213,17 +7213,6 @@ static const struct TrainerMon sParty_GruntSeafloorCavern5[] = {
     }
 };
 
-static const struct TrainerMon sParty_GruntUnused[] = {
-    {
-    .lvl = 31,
-    .species = SPECIES_WAILMER,
-    },
-    {
-    .lvl = 31,
-    .species = SPECIES_ZUBAT,
-    }
-};
-
 static const struct TrainerMon sParty_GruntMtPyre4[] = {
     {
     .lvl = 30,
@@ -11025,55 +11014,6 @@ static const struct TrainerMon sParty_Steven[] = {
     }
 };
 
-static const struct TrainerMon sParty_Anabel[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_BELDUM,
-    }
-};
-
-static const struct TrainerMon sParty_Tucker[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_BELDUM,
-    }
-};
-
-static const struct TrainerMon sParty_Spenser[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_BELDUM,
-    }
-};
-
-static const struct TrainerMon sParty_Greta[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_BELDUM,
-    }
-};
-
-static const struct TrainerMon sParty_Noland[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_BELDUM,
-    }
-};
-
-static const struct TrainerMon sParty_Lucy[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_BELDUM,
-    }
-};
-
-static const struct TrainerMon sParty_Brandon[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_BELDUM,
-    }
-};
-
 static const struct TrainerMon sParty_Andres2[] = {
     {
     .iv = TRAINER_PARTY_IVS(1, 1, 1, 1, 1, 1),
@@ -11774,33 +11714,5 @@ static const struct TrainerMon sParty_Everett[] = {
     {
     .lvl = 41,
     .species = SPECIES_WOBBUFFET,
-    }
-};
-
-static const struct TrainerMon sParty_Red[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_CHARMANDER,
-    }
-};
-
-static const struct TrainerMon sParty_Leaf[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_BULBASAUR,
-    }
-};
-
-static const struct TrainerMon sParty_BrendanLinkPlaceholder[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_GROUDON,
-    }
-};
-
-static const struct TrainerMon sParty_MayLinkPlaceholder[] = {
-    {
-    .lvl = 5,
-    .species = SPECIES_KYOGRE,
     }
 };
