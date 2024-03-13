@@ -2238,7 +2238,7 @@ static void Controller_HandleTrainerSlideBack(u32 battler)
     if (gSprites[gBattlerSpriteIds[battler]].callback == SpriteCallbackDummy)
     {
         if (GetBattlerSide(battler) == B_SIDE_OPPONENT)
-            FreeTrainerFrontPicPalette(gSprites[gBattlerSpriteIds[battler]].oam.affineParam);
+            FreeSpritePaletteByTag(gSprites[gBattlerSpriteIds[battler]].oam.affineParam);
         FreeSpriteOamMatrix(&gSprites[gBattlerSpriteIds[battler]]);
         DestroySprite(&gSprites[gBattlerSpriteIds[battler]]);
         BattleControllerComplete(battler);
@@ -2480,7 +2480,7 @@ void BtlController_HandleDrawTrainerPic(u32 battler, u32 trainerPicId, bool32 is
                                                    yPos,
                                                    subpriority);
 
-        gSprites[gBattlerSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(gTrainerFrontPicPaletteTable[trainerPicId].tag);
+        gSprites[gBattlerSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(trainerPicId);
         gSprites[gBattlerSpriteIds[battler]].x2 = -DISPLAY_WIDTH;
         gSprites[gBattlerSpriteIds[battler]].sSpeedX = 2;
         gSprites[gBattlerSpriteIds[battler]].oam.affineParam = trainerPicId;
@@ -2498,7 +2498,7 @@ void BtlController_HandleDrawTrainerPic(u32 battler, u32 trainerPicId, bool32 is
                                                              yPos,
                                                              subpriority);
 
-            gSprites[gBattlerSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(gTrainerFrontPicPaletteTable[trainerPicId].tag);
+            gSprites[gBattlerSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(trainerPicId);
             gSprites[gBattlerSpriteIds[battler]].oam.affineMode = ST_OAM_AFFINE_OFF;
             gSprites[gBattlerSpriteIds[battler]].hFlip = 1;
             gSprites[gBattlerSpriteIds[battler]].y2 = 48;
@@ -2544,10 +2544,10 @@ void BtlController_HandleTrainerSlide(u32 battler, u32 trainerPicId)
         SetMultiuseSpriteTemplateToTrainerBack(trainerPicId, GetBattlerPosition(battler));
         gBattlerSpriteIds[battler] = CreateSprite(&gMultiuseSpriteTemplate,
                                                   176,
-                                                  (8 - gTrainerFrontPicCoords[trainerPicId].size) * 4 + 40,
+                                                  40,
                                                   30);
         gSprites[gBattlerSpriteIds[battler]].oam.affineParam = trainerPicId;
-        gSprites[gBattlerSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(gTrainerFrontPicPaletteTable[trainerPicId].tag);
+        gSprites[gBattlerSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(trainerPicId);
         gSprites[gBattlerSpriteIds[battler]].x2 = 96;
         gSprites[gBattlerSpriteIds[battler]].x += 32;
         gSprites[gBattlerSpriteIds[battler]].sSpeedX = -2;
@@ -2859,7 +2859,7 @@ bool32 TwoOpponentIntroMons(u32 battler) // Double battle with both opponent pok
 // Sprite data for SpriteCB_FreePlayerSpriteLoadMonSprite
 #define sBattlerId data[5]
 
-void BtlController_HandleIntroTrainerBallThrow(u32 battler, u16 tagTrainerPal, const u32 *trainerPal, s16 framesToWait, void (*controllerCallback)(u32 battler))
+void BtlController_HandleIntroTrainerBallThrow(u32 battler, u16 tagTrainerPal, const u16 *trainerPal, s16 framesToWait, void (*controllerCallback)(u32 battler))
 {
     u8 paletteNum, taskId;
     u32 side = GetBattlerSide(battler);
@@ -2886,7 +2886,7 @@ void BtlController_HandleIntroTrainerBallThrow(u32 battler, u16 tagTrainerPal, c
         StartSpriteAnim(&gSprites[gBattlerSpriteIds[battler]], 1);
 
         paletteNum = AllocSpritePalette(tagTrainerPal);
-        LoadCompressedPalette(trainerPal, OBJ_PLTT_ID(paletteNum), PLTT_SIZE_4BPP);
+        LoadPalette(trainerPal, OBJ_PLTT_ID(paletteNum), PLTT_SIZE_4BPP);
         gSprites[gBattlerSpriteIds[battler]].oam.paletteNum = paletteNum;
     }
     else
@@ -2981,7 +2981,7 @@ static void SpriteCB_FreePlayerSpriteLoadMonSprite(struct Sprite *sprite)
 
 static void SpriteCB_FreeOpponentSprite(struct Sprite *sprite)
 {
-    FreeTrainerFrontPicPalette(sprite->oam.affineParam);
+    FreeSpritePaletteByTag(sprite->oam.affineParam);
     FreeSpriteOamMatrix(sprite);
     DestroySprite(sprite);
 }

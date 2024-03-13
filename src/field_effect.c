@@ -1,4 +1,5 @@
 #include "global.h"
+#include "data.h"
 #include "decompress.h"
 #include "event_object_movement.h"
 #include "field_camera.h"
@@ -244,8 +245,6 @@ static void UseVsSeeker_CleanUpFieldEffect(struct Task *task);
 static u8 sActiveList[32];
 
 // External declarations
-extern const struct CompressedSpritePalette gTrainerFrontPicPaletteTable[];
-extern const struct CompressedSpriteSheet gTrainerFrontPicTable[];
 extern u8 *gFieldEffectScriptPointers[];
 extern const struct SpriteTemplate *const gFieldEffectObjectTemplatePointers[];
 
@@ -903,22 +902,18 @@ bool8 FieldEffectActiveListContains(u8 id)
 u8 CreateTrainerSprite(u8 trainerSpriteID, s16 x, s16 y, u8 subpriority, u8 *buffer)
 {
     struct SpriteTemplate spriteTemplate;
-    LoadCompressedSpritePaletteOverrideBuffer(&gTrainerFrontPicPaletteTable[trainerSpriteID], buffer);
-    LoadCompressedSpriteSheetOverrideBuffer(&gTrainerFrontPicTable[trainerSpriteID], buffer);
-    spriteTemplate.tileTag = gTrainerFrontPicTable[trainerSpriteID].tag;
-    spriteTemplate.paletteTag = gTrainerFrontPicPaletteTable[trainerSpriteID].tag;
+    const struct TrainerSprite *trainerSprite = &gTrainerSpriteTable[trainerSpriteID];
+    u8 paletteNum = AllocSpritePalette(trainerSpriteID);
+    LoadPalette(trainerSprite->palette, OBJ_PLTT_ID(paletteNum), PLTT_SIZE_4BPP);
+    LoadCompressedSpriteSheetOverrideBuffer(&trainerSprite->sprite, buffer);
+    spriteTemplate.tileTag = trainerSpriteID;
+    spriteTemplate.paletteTag = trainerSpriteID;
     spriteTemplate.oam = &sOam_64x64;
     spriteTemplate.anims = gDummySpriteAnimTable;
     spriteTemplate.images = NULL;
     spriteTemplate.affineAnims = gDummySpriteAffineAnimTable;
     spriteTemplate.callback = SpriteCallbackDummy;
     return CreateSprite(&spriteTemplate, x, y, subpriority);
-}
-
-static void UNUSED LoadTrainerGfx_TrainerCard(u8 gender, u16 palOffset, u8 *dest)
-{
-    LZ77UnCompVram(gTrainerFrontPicTable[gender].data, dest);
-    LoadCompressedPalette(gTrainerFrontPicPaletteTable[gender].data, palOffset, PLTT_SIZE_4BPP);
 }
 
 u8 AddNewGameBirchObject(s16 x, s16 y, u8 subpriority)
@@ -929,7 +924,7 @@ u8 AddNewGameBirchObject(s16 x, s16 y, u8 subpriority)
 
 u8 CreateMonSprite_PicBox(u16 species, s16 x, s16 y, u8 subpriority)
 {
-    s32 spriteId = CreateMonPicSprite(species, 0, 0x8000, TRUE, x, y, 0, species);
+    s32 spriteId = CreateMonPicSprite(species, 0, 0x8000, FALSE, x, y, 0, species);
     PreservePaletteInWeather(IndexOfSpritePaletteTag(species) + 0x10);
     if (spriteId == 0xFFFF)
         return MAX_SPRITES;
@@ -939,7 +934,7 @@ u8 CreateMonSprite_PicBox(u16 species, s16 x, s16 y, u8 subpriority)
 
 u8 CreateMonSprite_FieldMove(u16 species, u32 otId, u32 personality, s16 x, s16 y, u8 subpriority)
 {
-    u16 spriteId = CreateMonPicSprite(species, otId, personality, TRUE, x, y, 0, species);
+    u16 spriteId = CreateMonPicSprite(species, otId, personality, FALSE, x, y, 0, species);
     PreservePaletteInWeather(IndexOfSpritePaletteTag(species) + 0x10);
     if (spriteId == 0xFFFF)
         return MAX_SPRITES;
@@ -954,7 +949,7 @@ void FreeResourcesAndDestroySprite(struct Sprite *sprite, u8 spriteId)
     {
         FreeOamMatrix(sprite->oam.matrixNum);
     }
-    FreeAndDestroyMonPicSprite(spriteId);
+    FreeAndDestroyPicSprite(spriteId);
 }
 
 // r, g, b are between 0 and 16

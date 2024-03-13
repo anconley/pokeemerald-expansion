@@ -513,21 +513,21 @@ static const struct SpriteTemplate sTrainerBackSpriteTemplates[] =
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
-    [TRAINER_BACK_PIC_RED] = {
+    [TRAINER_BACK_PIC_RG_RED] = {
         .tileTag = TAG_NONE,
-        .paletteTag = TRAINER_BACK_PIC_RED,
+        .paletteTag = TRAINER_BACK_PIC_RG_RED,
         .oam = &gOamData_BattleSpritePlayerSide,
         .anims = gBackAnims_5Frames,
-        .images = gTrainerBackPicTable_Red,
+        .images = gTrainerBackPicTable_RG_Red,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
-    [TRAINER_BACK_PIC_LEAF] = {
+    [TRAINER_BACK_PIC_RG_LEAF] = {
         .tileTag = TAG_NONE,
-        .paletteTag = TRAINER_BACK_PIC_LEAF,
+        .paletteTag = TRAINER_BACK_PIC_RG_LEAF,
         .oam = &gOamData_BattleSpritePlayerSide,
         .anims = gBackAnims_5Frames,
-        .images = gTrainerBackPicTable_Leaf,
+        .images = gTrainerBackPicTable_RG_Leaf,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
@@ -564,6 +564,24 @@ static const struct SpriteTemplate sTrainerBackSpriteTemplates[] =
         .oam = &gOamData_BattleSpritePlayerSide,
         .anims = gBackAnims_4Frames,
         .images = gTrainerBackPicTable_Steven,
+        .affineAnims = gAffineAnims_BattleSpritePlayerSide,
+        .callback = SpriteCB_BattleSpriteStartSlideLeft,
+    },
+    [TRAINER_BACK_PIC_RG_POKEDUDE] = {
+        .tileTag = TAG_NONE,
+        .paletteTag = TRAINER_BACK_PIC_RG_POKEDUDE,
+        .oam = &gOamData_BattleSpritePlayerSide,
+        .anims = gBackAnims_4Frames,
+        .images = gTrainerBackPicTable_RG_Pokedude,
+        .affineAnims = gAffineAnims_BattleSpritePlayerSide,
+        .callback = SpriteCB_BattleSpriteStartSlideLeft,
+    },
+    [TRAINER_BACK_PIC_RG_OLD_MAN] = {
+        .tileTag = TAG_NONE,
+        .paletteTag = TRAINER_BACK_PIC_RG_OLD_MAN,
+        .oam = &gOamData_BattleSpritePlayerSide,
+        .anims = gBackAnims_4Frames,
+        .images = gTrainerBackPicTable_RG_OldMan,
         .affineAnims = gAffineAnims_BattleSpritePlayerSide,
         .callback = SpriteCB_BattleSpriteStartSlideLeft,
     },
@@ -1314,7 +1332,7 @@ u16 GetUnionRoomTrainerPic(void)
 
     arrId = gLinkPlayers[linkId].trainerId % NUM_UNION_ROOM_CLASSES;
     arrId |= gLinkPlayers[linkId].gender * NUM_UNION_ROOM_CLASSES;
-    return FacilityClassToPicIndex(gUnionRoomFacilityClasses[arrId]);
+    return gFacilityClassToPicIndex[gUnionRoomFacilityClasses[arrId]];
 }
 
 u16 GetUnionRoomTrainerClass(void)
@@ -1844,7 +1862,7 @@ void SetMultiuseSpriteTemplateToTrainerBack(u16 trainerPicId, u8 battlerPosition
             gMultiuseSpriteTemplate = gMonSpritesGfxPtr->templates[battlerPosition];
         else
             gMultiuseSpriteTemplate = gBattlerSpriteTemplates[battlerPosition];
-        gMultiuseSpriteTemplate.anims = gTrainerFrontAnimsPtrTable[trainerPicId];
+        gMultiuseSpriteTemplate.anims = gAnims_None;
     }
 }
 
@@ -1856,7 +1874,7 @@ void SetMultiuseSpriteTemplateToTrainerFront(u16 trainerPicId, u8 battlerPositio
         gMultiuseSpriteTemplate = gBattlerSpriteTemplates[battlerPosition];
 
     gMultiuseSpriteTemplate.paletteTag = trainerPicId;
-    gMultiuseSpriteTemplate.anims = gTrainerFrontAnimsPtrTable[trainerPicId];
+    gMultiuseSpriteTemplate.anims = gAnims_None;
 }
 
 static void EncryptBoxMon(struct BoxPokemon *boxMon)
@@ -4387,7 +4405,7 @@ u8 GetTrainerEncounterMusicId(u16 trainerOpponentId)
     else if (InTrainerHillChallenge())
         return GetTrainerEncounterMusicIdInTrainerHill(trainerOpponentId);
     else
-        return TRAINER_ENCOUNTER_MUSIC(trainerOpponentId);
+        return gTrainers[trainerOpponentId].encounterMusic;
 }
 
 u16 ModifyStatByNature(u8 nature, u16 stat, u8 statIndex)
@@ -4998,10 +5016,6 @@ u16 GetBattleBGM(void)
         case TRAINER_CLASS_CHAMPION:
             return MUS_VS_CHAMPION;
         case TRAINER_CLASS_RIVAL:
-            if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
-                return MUS_VS_RIVAL;
-            if (!StringCompare(gTrainers[gTrainerBattleOpponent_A].trainerName, gText_BattleWallyName))
-                return regionalBattleMusic[1];
             return MUS_VS_RIVAL;
         case TRAINER_CLASS_ELITE_FOUR:
             return MUS_VS_ELITE_FOUR;
@@ -5455,11 +5469,6 @@ u8 GetOpposingLinkMultiBattlerId(bool8 rightSide, u8 multiplayerId)
             break;
     }
     return i;
-}
-
-u16 FacilityClassToPicIndex(u16 facilityClass)
-{
-    return gFacilityClassToPicIndex[facilityClass];
 }
 
 u16 PlayerGenderToFrontTrainerPicId(u8 playerGender)

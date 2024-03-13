@@ -55,10 +55,13 @@ struct TrainerMon
 
 struct Trainer
 {
-    /*0x00*/ u8 partySize:7;
-             bool8 doubleBattle:1;
+    /*0x00*/ u8 partySize:3;
+             u8 mugshotColor:5;
     /*0x01*/ u8 trainerClass;
-    /*0x02*/ u8 encounterMusic_gender; // last bit is gender
+    /*0x02*/ u8 encounterMusic:5;
+             bool8 gender:1;
+             bool8 doubleBattle:1;
+             bool8 mugshotEnabled:1;
     /*0x03*/ u8 trainerPic;
     /*0x04*/ u8 trainerName[TRAINER_NAME_LENGTH + 1];
     union
@@ -87,6 +90,14 @@ struct Trainer
     /*0x14*/ const struct TrainerMon *party;
 };
 
+struct TrainerSprite
+{
+    struct CompressedSpriteSheet sprite;
+    const u16 *palette;
+    const struct Coords16 mugshotCoords;
+    s16 mugshotRotation;
+};
+
 #define TRAINER_ENCOUNTER_MUSIC(trainer)((gTrainers[trainer].encounterMusic_gender & 0x7F))
 
 extern const u16 gMinigameDigits_Pal[];
@@ -98,8 +109,10 @@ extern const struct SpriteFrameImage gBattlerPicTable_PlayerRight[];
 extern const struct SpriteFrameImage gBattlerPicTable_OpponentRight[];
 extern const struct SpriteFrameImage gTrainerBackPicTable_Brendan[];
 extern const struct SpriteFrameImage gTrainerBackPicTable_May[];
-extern const struct SpriteFrameImage gTrainerBackPicTable_Red[];
-extern const struct SpriteFrameImage gTrainerBackPicTable_Leaf[];
+extern const struct SpriteFrameImage gTrainerBackPicTable_RG_Red[];
+extern const struct SpriteFrameImage gTrainerBackPicTable_RG_Leaf[];
+extern const struct SpriteFrameImage gTrainerBackPicTable_RG_Pokedude[];
+extern const struct SpriteFrameImage gTrainerBackPicTable_RG_OldMan[];
 extern const struct SpriteFrameImage gTrainerBackPicTable_RubySapphireBrendan[];
 extern const struct SpriteFrameImage gTrainerBackPicTable_RubySapphireMay[];
 extern const struct SpriteFrameImage gTrainerBackPicTable_Wally[];
@@ -111,13 +124,11 @@ extern const union AffineAnimCmd *const gAffineAnims_BattleSpriteContest[];
 
 extern const union AnimCmd sAnim_GeneralFrame0[];
 extern const union AnimCmd *const gAnims_MonPic[];
-extern const union AnimCmd *const *const gTrainerFrontAnimsPtrTable[];
-extern const struct MonCoords gTrainerFrontPicCoords[];
-extern const struct CompressedSpriteSheet gTrainerFrontPicTable[];
-extern const struct CompressedSpritePalette gTrainerFrontPicPaletteTable[];
+extern const union AnimCmd *const gAnims_None[];
+extern const struct TrainerSprite gTrainerSpriteTable[];
 extern const union AnimCmd *const gBackAnims_4Frames[];
 extern const union AnimCmd *const gBackAnims_5Frames[];
-extern const u32 *const gTrainerBackPicPaletteTable[];
+extern const u16 *const gTrainerBackPicPaletteTable[];
 
 extern const struct Trainer gTrainers[];
 extern const u8 gTrainerClassNames[][13];

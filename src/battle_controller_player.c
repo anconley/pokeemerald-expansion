@@ -1837,7 +1837,7 @@ u32 LinkPlayerGetTrainerPicId(u32 multiplayerId)
     u8 version = gLinkPlayers[multiplayerId].version & 0xFF;
 
     if (version == VERSION_FIRE_RED || version == VERSION_LEAF_GREEN)
-        trainerPicId = gender + TRAINER_BACK_PIC_RED;
+        trainerPicId = gender + TRAINER_BACK_PIC_RG_RED;
     else if (version == VERSION_RUBY || version == VERSION_SAPPHIRE)
         trainerPicId = gender + TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN;
     else
@@ -1864,32 +1864,17 @@ static u32 PlayerGetTrainerBackPicId(void)
 static void PlayerHandleDrawTrainerPic(u32 battler)
 {
     bool32 isFrontPic;
-    s16 xPos, yPos;
+    s16 xPos;
     u32 trainerPicId;
 
     trainerPicId = PlayerGetTrainerBackPicId();
+    xPos = 80;
     if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
     {
         if ((GetBattlerPosition(battler) & BIT_FLANK) != B_FLANK_LEFT) // Second mon, on the right.
             xPos = 90;
         else // First mon, on the left.
             xPos = 32;
-
-        if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER && gPartnerTrainerId < TRAINER_PARTNER(PARTNER_NONE))
-        {
-            xPos = 90;
-            yPos = 80;
-        }
-        else
-        {
-            yPos = 80;
-        }
-
-    }
-    else
-    {
-        xPos = 80;
-        yPos = 80;
     }
 
     // Use front pic table for any tag battles unless your partner is Steven or a custom partner.
@@ -1906,7 +1891,7 @@ static void PlayerHandleDrawTrainerPic(u32 battler)
         isFrontPic = FALSE;
     }
 
-    BtlController_HandleDrawTrainerPic(battler, trainerPicId, isFrontPic, xPos, yPos, -1);
+    BtlController_HandleDrawTrainerPic(battler, trainerPicId, isFrontPic, xPos, 80, -1);
 }
 
 static void PlayerHandleTrainerSlide(u32 battler)
@@ -2238,7 +2223,7 @@ static void PlayerHandleOneReturnValue_Duplicate(u32 battler)
 static void PlayerHandleIntroTrainerBallThrow(u32 battler)
 {
     u32 trainerPicId = PlayerGenderToBackTrainerPicId(gSaveBlock2Ptr->playerGender);
-    const u32 *trainerPal = gTrainerBackPicPaletteTable[gSaveBlock2Ptr->playerGender];
+    const u16 *trainerPal = gTrainerBackPicPaletteTable[gSaveBlock2Ptr->playerGender];
     BtlController_HandleIntroTrainerBallThrow(battler, trainerPicId, trainerPal, 31, Intro_TryShinyAnimShowHealthbox);
 }
 

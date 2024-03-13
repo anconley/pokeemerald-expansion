@@ -420,7 +420,7 @@ static void WallyHandleFaintingCry(u32 battler)
 
 static void WallyHandleIntroTrainerBallThrow(u32 battler)
 {
-    const u32 *trainerPal = gTrainerBackPicPaletteTable[TRAINER_BACK_PIC_WALLY];
+    const u16 *trainerPal = gTrainerBackPicPaletteTable[TRAINER_BACK_PIC_WALLY];
     BtlController_HandleIntroTrainerBallThrow(battler, 0xD6F8, trainerPal, 31, Intro_TryShinyAnimShowHealthbox);
 }
 

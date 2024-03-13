@@ -368,31 +368,16 @@ static void RecordedPlayerHandleSwitchInAnim(u32 battler)
 static void RecordedPlayerHandleDrawTrainerPic(u32 battler)
 {
     bool32 isFrontPic;
-    s16 xPos, yPos;
+    s16 xPos;
     u32 trainerPicId;
 
+    xPos = 80;
     if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
     {
         if ((GetBattlerPosition(battler) & BIT_FLANK) != 0) // second mon
             xPos = 90;
         else // first mon
             xPos = 32;
-
-        if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
-        {
-            xPos = 90;
-            yPos = 80;
-        }
-        else
-        {
-            yPos = 80;
-        }
-
-    }
-    else
-    {
-        xPos = 80;
-        yPos = 80;
     }
 
     if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
@@ -414,7 +399,7 @@ static void RecordedPlayerHandleDrawTrainerPic(u32 battler)
         isFrontPic = FALSE;
     }
 
-    BtlController_HandleDrawTrainerPic(battler, trainerPicId, isFrontPic, xPos, yPos, -1);
+    BtlController_HandleDrawTrainerPic(battler, trainerPicId, isFrontPic, xPos, 80, -1);
 }
 
 static void RecordedPlayerHandleTrainerSlideBack(u32 battler)
@@ -512,14 +497,14 @@ static void RecordedPlayerHandleStatusAnimation(u32 battler)
 static void RecordedPlayerHandleIntroTrainerBallThrow(u32 battler)
 {
     u32 trainerPicId;
-    const u32 *trainerPal;
+    const u16 *trainerPal;
 
     if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
         trainerPicId = GetLinkPlayerBackTrainerPicId(GetBattlerMultiplayerId(battler));
     else
         trainerPicId = PlayerGenderToBackTrainerPicId(gSaveBlock2Ptr->playerGender);
 
-    trainerPal = gTrainerFrontPicPaletteTable[trainerPicId].data;
+    trainerPal = gTrainerSpriteTable[trainerPicId].palette;
     BtlController_HandleIntroTrainerBallThrow(battler, 0xD6F9, trainerPal, 24, Intro_TryShinyAnimShowHealthbox);
 }
 

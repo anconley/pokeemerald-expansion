@@ -621,21 +621,19 @@ void BattleGfxSfxDummy2(u16 species)
 
 void DecompressTrainerFrontPic(u16 frontPicId, u8 battler)
 {
+    const struct TrainerSprite *trainerSprite = &gTrainerSpriteTable[frontPicId];
     u8 position = GetBattlerPosition(battler);
-    DecompressPicFromTable(&gTrainerFrontPicTable[frontPicId],
-                           gMonSpritesGfxPtr->sprites.ptr[position]);
-    LoadCompressedSpritePalette(&gTrainerFrontPicPaletteTable[frontPicId]);
+    LZ77UnCompWram(trainerSprite->sprite.data,
+                   gMonSpritesGfxPtr->sprites.ptr[position]);
+    position = AllocSpritePalette(frontPicId);
+    LoadPalette(trainerSprite->palette,
+                OBJ_PLTT_ID(position), PLTT_SIZE_4BPP);
 }
 
 void DecompressTrainerBackPic(u16 backPicId, u8 battler)
 {
-    LoadCompressedPalette(gTrainerBackPicPaletteTable[backPicId],
+    LoadPalette(gTrainerBackPicPaletteTable[backPicId],
                           OBJ_PLTT_ID(battler), PLTT_SIZE_4BPP);
-}
-
-void FreeTrainerFrontPicPalette(u16 frontPicId)
-{
-    FreeSpritePaletteByTag(gTrainerFrontPicPaletteTable[frontPicId].tag);
 }
 
 bool8 BattleLoadAllHealthBoxesGfx(u8 state)

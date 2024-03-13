@@ -1426,7 +1426,7 @@ static void SpriteCB_CreditsMon(struct Sprite *sprite)
 {
     if (gIntroCredits_MovingSceneryState != INTROCRED_SCENERY_NORMAL)
     {
-        FreeAndDestroyMonPicSprite(sprite->sSpriteId);
+        FreeAndDestroyPicSprite(sprite->sSpriteId);
         return;
     }
 
@@ -1504,7 +1504,7 @@ static void SpriteCB_CreditsMon(struct Sprite *sprite)
     case 10:
         SetGpuReg(REG_OFFSET_BLDCNT, 0);
         SetGpuReg(REG_OFFSET_BLDALPHA, 0);
-        FreeAndDestroyMonPicSprite(sprite->data[6]);
+        FreeAndDestroyPicSprite(sprite->data[6]);
         break;
     }
 }

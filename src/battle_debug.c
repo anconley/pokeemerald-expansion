@@ -1094,7 +1094,7 @@ static void SwitchToDebugView(u8 taskId)
         if (data->spriteIds.aiIconSpriteIds[i] != 0xFF)
             FreeAndDestroyMonIconSprite(&gSprites[data->spriteIds.aiIconSpriteIds[i]]);
     }
-    FreeAndDestroyMonPicSprite(data->aiMonSpriteId);
+    FreeAndDestroyPicSprite(data->aiMonSpriteId);
     ClearWindowTilemap(data->aiMovesWindowId);
     RemoveWindow(data->aiMovesWindowId);
 

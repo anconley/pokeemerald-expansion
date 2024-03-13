@@ -431,14 +431,14 @@ static void PlayerPartnerHandleHealthBarUpdate(u32 battler)
 
 static void PlayerPartnerHandleIntroTrainerBallThrow(u32 battler)
 {
-    const u32 *trainerPal;
+    const u16 *trainerPal;
 
     if (gPartnerTrainerId >= TRAINER_PARTNER(PARTNER_NONE)) // Custom multi battle.
         trainerPal = gTrainerBackPicPaletteTable[gPartners[gPartnerTrainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerPic];
     else if (IsAiVsAiBattle())
-        trainerPal = gTrainerFrontPicPaletteTable[gTrainers[gPartnerTrainerId].trainerPic].data;
+        trainerPal = gTrainerSpriteTable[gTrainers[gPartnerTrainerId].trainerPic].palette;
     else
-        trainerPal = gTrainerFrontPicPaletteTable[GetFrontierTrainerFrontSpriteId(gPartnerTrainerId)].data; // 2 vs 2 multi battle in Battle Frontier, load front sprite and pal.
+        trainerPal = gTrainerSpriteTable[GetFrontierTrainerFrontSpriteId(gPartnerTrainerId)].palette; // 2 vs 2 multi battle in Battle Frontier, load front sprite and pal.
 
     BtlController_HandleIntroTrainerBallThrow(battler, 0xD6F9, trainerPal, 24, Controller_PlayerPartnerShowIntroHealthbox);
 }

@@ -427,7 +427,7 @@ static void LinkOpponentHandleDrawTrainerPic(u32 battler)
     }
 
     BtlController_HandleDrawTrainerPic(battler, trainerPicId, TRUE,
-                                       xPos, 40 + 4 * (8 - gTrainerFrontPicCoords[trainerPicId].size),
+                                       xPos, 40,
                                        -1);
 }
 
