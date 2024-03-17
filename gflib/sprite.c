@@ -310,6 +310,23 @@ void AnimateSprites(void)
     }
 }
 
+static inline void InsertionSort(u32 *spritePriorities, s32 n)
+{
+    s32 i = 1;
+    while (i < n)
+    {
+        u32 x = spritePriorities[i];
+        s32 j = i - 1;
+        while (j >= 0 && spritePriorities[j] > x)
+        {
+            spritePriorities[j + 1] = spritePriorities[j];
+            j--;
+        }
+        spritePriorities[j + 1] = x;
+        i++;
+    }
+}
+
 void BuildOamBuffer(void)
 {
     bool32 oamLoadDisabled;
@@ -378,19 +395,7 @@ void BuildOamBuffer(void)
             | (index << 0);
     }
 
-    j = 1;
-    while (j < toSort)
-    {
-        u32 x = spritePriorities[j];
-        s32 k = j - 1;
-        while (k >= 0 && spritePriorities[k] > x)
-        {
-            spritePriorities[k + 1] = spritePriorities[k];
-            k--;
-        }
-        spritePriorities[k + 1] = x;
-        j++;
-    }
+    InsertionSort(spritePriorities, toSort);
 
     for (i = 0; i < toSort; i++)
         sSpriteOrder[i] = spritePriorities[i] & 0xFF;

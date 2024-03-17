@@ -4401,7 +4401,7 @@ s32 GetBattlerMultiplayerId(u16 id)
 u8 GetTrainerEncounterMusicId(u16 trainerOpponentId)
 {
     if (InBattlePyramid())
-        return GetTrainerEncounterMusicIdInBattlePyramid(trainerOpponentId);
+        return GetFacilityClassEncounterMusicId(gFacilityTrainers[trainerOpponentId].facilityClass);
     else if (InTrainerHillChallenge())
         return GetTrainerEncounterMusicIdInTrainerHill(trainerOpponentId);
     else
@@ -4973,7 +4973,7 @@ u16 GetBattleBGM(void)
         switch (GetMonData(&gEnemyParty[0], MON_DATA_SPECIES, NULL))
         {
         case SPECIES_RAYQUAZA:
-            return MUS_VS_RAYQUAZA;
+            return MUS_VS_KYOGRE_GROUDON;
         case SPECIES_KYOGRE:
         case SPECIES_GROUDON:
             return MUS_VS_KYOGRE_GROUDON;
