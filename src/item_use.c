@@ -45,6 +45,7 @@
 #include "constants/items.h"
 #include "constants/songs.h"
 #include "constants/map_types.h"
+#include "region_map.h"
 #include "m4a.h"
 
 static void SetUpItemUseCallback(u8);
@@ -266,11 +267,19 @@ static void ItemUseOnFieldCB_Bike(u8 taskId)
     }
     else
     {
+        static const u16 sRegionalBikeMusic[NUM_REGION] =
+        {
+            [REGION_HOENN] = MUS_CYCLING,
+            [REGION_KANTO] = MUS_RG_CYCLING
+        };
+        u16 bikeMusic;
+
         m4aSongNumStart(SE_BIKE_BELL);
         gSaveBlock2Ptr->playerBike = ItemId_GetSecondaryId(gSpecialVar_ItemId);
         SetPlayerAvatarTransitionFlags(PLAYER_AVATAR_FLAG_BIKE);
-        Overworld_SetSavedMusic(MUS_CYCLING);
-        Overworld_ChangeMusicTo(MUS_CYCLING);
+        bikeMusic = sRegionalBikeMusic[GetCurrentRegion()];
+        Overworld_SetSavedMusic(bikeMusic);
+        Overworld_ChangeMusicTo(bikeMusic);
     }
     ScriptUnfreezeObjectEvents();
     UnlockPlayerFieldControls();

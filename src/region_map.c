@@ -2028,3 +2028,8 @@ static void CB_ExitFlyMap(void)
         break;
     }
 }
+
+u32 GetCurrentRegion(void)
+{
+    return gRegionMapEntries[gMapHeader.regionMapSectionId].region;
+}
