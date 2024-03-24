@@ -1,11 +1,11 @@
 #ifndef GUARD_FIELDMAP_H
 #define GUARD_FIELDMAP_H
 
-#define NUM_TILES_IN_PRIMARY 512
+#define NUM_TILES_IN_PRIMARY 640
 #define NUM_TILES_TOTAL 1024
-#define NUM_METATILES_IN_PRIMARY 512
+#define NUM_METATILES_IN_PRIMARY 640
 #define NUM_METATILES_TOTAL 1024
-#define NUM_PALS_IN_PRIMARY 6
+#define NUM_PALS_IN_PRIMARY 7
 #define NUM_PALS_TOTAL 13
 #define MAX_MAP_DATA_SIZE 10240
 
@@ -19,10 +19,18 @@
 #define MAP_OFFSET_W (MAP_OFFSET * 2 + 1)
 #define MAP_OFFSET_H (MAP_OFFSET * 2)
 
+// References
+#define NUM_TILES_IN_PRIMARY_EMERALD 512
+#define NUM_METATILES_IN_PRIMARY_EMERALD 512
+#define NUM_PALS_IN_PRIMARY_EMERALD 6
+
+#define NUM_TILES_IN_PRIMARY_FRLG 640
+#define NUM_METATILES_IN_PRIMARY_FRLG 640
+#define NUM_PALS_IN_PRIMARY_FRLG 7
+
 #include "main.h"
 
 extern struct BackupMapLayout gBackupMapLayout;
-extern u16 ALIGNED(4) sBackupMapData[MAX_MAP_DATA_SIZE];
 
 u32 MapGridGetMetatileIdAt(int, int);
 u32 MapGridGetMetatileBehaviorAt(int, int);
@@ -32,13 +40,15 @@ void GetCameraCoords(u16 *, u16 *);
 u8 MapGridGetCollisionAt(int, int);
 int GetMapBorderIdAt(int x, int y);
 bool32 CanCameraMoveInDirection(int direction);
-u16 GetMetatileAttributesById(u16 metatileId);
+u32 GetMetatileAttributesById(u16 metatileId, u8 attributeType);
 void GetCameraFocusCoords(u16 *x, u16 *y);
 u8 MapGridGetMetatileLayerTypeAt(int x, int y);
 u8 MapGridGetElevationAt(int x, int y);
 bool8 CameraMove(int deltaX, int deltaY);
 void SaveMapView(void);
 void SetCameraFocusCoords(u16 x, u16 y);
+u32 ExtractMetatileAttribute(u32, u8);
+u32 MapGridGetMetatileAttributeAt(int, int, u8);
 void InitMap(void);
 void InitMapFromSavedGame(void);
 void InitTrainerHillMap(void);

@@ -2,142 +2,35 @@
 #include "metatile_behavior.h"
 #include "constants/metatile_behaviors.h"
 
-#define TILE_FLAG_HAS_ENCOUNTERS (1 << 0)
-#define TILE_FLAG_SURFABLE       (1 << 1)
-#define TILE_FLAG_UNUSED         (1 << 2) // Roughly all of the traversable metatiles. Set but never read
-
-static const u8 sTileBitAttributes[NUM_METATILE_BEHAVIORS] =
+static const bool8 sBehaviorSurfable[NUM_METATILE_BEHAVIORS] =
 {
-    [MB_NORMAL]                          = TILE_FLAG_UNUSED,
-    [MB_TALL_GRASS]                      = TILE_FLAG_UNUSED | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_LONG_GRASS]                      = TILE_FLAG_UNUSED | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_UNUSED_05]                       = TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_DEEP_SAND]                       = TILE_FLAG_UNUSED | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_SHORT_GRASS]                     = TILE_FLAG_UNUSED,
-    [MB_CAVE]                            = TILE_FLAG_UNUSED | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_LONG_GRASS_SOUTH_EDGE]           = TILE_FLAG_UNUSED,
-    [MB_NO_RUNNING]                      = TILE_FLAG_UNUSED,
-    [MB_INDOOR_ENCOUNTER]                = TILE_FLAG_UNUSED | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_MOUNTAIN_TOP]                    = TILE_FLAG_UNUSED,
-    [MB_BATTLE_PYRAMID_WARP]             = TILE_FLAG_UNUSED,
-    [MB_MOSSDEEP_GYM_WARP]               = TILE_FLAG_UNUSED,
-    [MB_MT_PYRE_HOLE]                    = TILE_FLAG_UNUSED,
-    [MB_POND_WATER]                      = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_INTERIOR_DEEP_WATER]             = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_DEEP_WATER]                      = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_WATERFALL]                       = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE,
-    [MB_SOOTOPOLIS_DEEP_WATER]           = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE,
-    [MB_OCEAN_WATER]                     = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_PUDDLE]                          = TILE_FLAG_UNUSED,
-    [MB_SHALLOW_WATER]                   = TILE_FLAG_UNUSED,
-    [MB_NO_SURFACING]                    = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE,
-    [MB_STAIRS_OUTSIDE_ABANDONED_SHIP]   = TILE_FLAG_UNUSED,
-    [MB_SHOAL_CAVE_ENTRANCE]             = TILE_FLAG_UNUSED,
-    [MB_ICE]                             = TILE_FLAG_UNUSED,
-    [MB_SAND]                            = TILE_FLAG_UNUSED,
-    [MB_SEAWEED]                         = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_UNUSED_23]                       = TILE_FLAG_UNUSED,
-    [MB_ASHGRASS]                        = TILE_FLAG_UNUSED | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_FOOTPRINTS]                      = TILE_FLAG_UNUSED | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_THIN_ICE]                        = TILE_FLAG_UNUSED,
-    [MB_CRACKED_ICE]                     = TILE_FLAG_UNUSED,
-    [MB_HOT_SPRINGS]                     = TILE_FLAG_UNUSED,
-    [MB_LAVARIDGE_GYM_B1F_WARP]          = TILE_FLAG_UNUSED,
-    [MB_SEAWEED_NO_SURFACING]            = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE | TILE_FLAG_HAS_ENCOUNTERS,
-    [MB_REFLECTION_UNDER_BRIDGE]         = TILE_FLAG_UNUSED,
-    [MB_IMPASSABLE_EAST]                 = TILE_FLAG_UNUSED,
-    [MB_IMPASSABLE_WEST]                 = TILE_FLAG_UNUSED,
-    [MB_IMPASSABLE_NORTH]                = TILE_FLAG_UNUSED,
-    [MB_IMPASSABLE_SOUTH]                = TILE_FLAG_UNUSED,
-    [MB_IMPASSABLE_NORTHEAST]            = TILE_FLAG_UNUSED,
-    [MB_IMPASSABLE_NORTHWEST]            = TILE_FLAG_UNUSED,
-    [MB_IMPASSABLE_SOUTHEAST]            = TILE_FLAG_UNUSED,
-    [MB_IMPASSABLE_SOUTHWEST]            = TILE_FLAG_UNUSED,
-    [MB_JUMP_NORTHEAST]                  = TILE_FLAG_UNUSED,
-    [MB_JUMP_NORTHWEST]                  = TILE_FLAG_UNUSED,
-    [MB_JUMP_SOUTHEAST]                  = TILE_FLAG_UNUSED,
-    [MB_JUMP_SOUTHWEST]                  = TILE_FLAG_UNUSED,
-    [MB_WALK_EAST]                       = TILE_FLAG_UNUSED,
-    [MB_WALK_WEST]                       = TILE_FLAG_UNUSED,
-    [MB_WALK_NORTH]                      = TILE_FLAG_UNUSED,
-    [MB_WALK_SOUTH]                      = TILE_FLAG_UNUSED,
-    [MB_SLIDE_EAST]                      = TILE_FLAG_UNUSED,
-    [MB_SLIDE_WEST]                      = TILE_FLAG_UNUSED,
-    [MB_SLIDE_NORTH]                     = TILE_FLAG_UNUSED,
-    [MB_SLIDE_SOUTH]                     = TILE_FLAG_UNUSED,
-    [MB_TRICK_HOUSE_PUZZLE_8_FLOOR]      = TILE_FLAG_UNUSED,
-    [MB_UNUSED_49]                       = TILE_FLAG_UNUSED,
-    [MB_UNUSED_4A]                       = TILE_FLAG_UNUSED,
-    [MB_EASTWARD_CURRENT]                = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE,
-    [MB_WESTWARD_CURRENT]                = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE,
-    [MB_NORTHWARD_CURRENT]               = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE,
-    [MB_SOUTHWARD_CURRENT]               = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE,
-    [MB_NON_ANIMATED_DOOR]               = TILE_FLAG_UNUSED,
-    [MB_LADDER]                          = TILE_FLAG_UNUSED,
-    [MB_EAST_ARROW_WARP]                 = TILE_FLAG_UNUSED,
-    [MB_WEST_ARROW_WARP]                 = TILE_FLAG_UNUSED,
-    [MB_NORTH_ARROW_WARP]                = TILE_FLAG_UNUSED,
-    [MB_SOUTH_ARROW_WARP]                = TILE_FLAG_UNUSED,
-    [MB_CRACKED_FLOOR_HOLE]              = TILE_FLAG_UNUSED,
-    [MB_AQUA_HIDEOUT_WARP]               = TILE_FLAG_UNUSED,
-    [MB_LAVARIDGE_GYM_1F_WARP]           = TILE_FLAG_UNUSED,
-    [MB_ANIMATED_DOOR]                   = TILE_FLAG_UNUSED,
-    [MB_UP_ESCALATOR]                    = TILE_FLAG_UNUSED,
-    [MB_DOWN_ESCALATOR]                  = TILE_FLAG_UNUSED,
-    [MB_WATER_DOOR]                      = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE,
-    [MB_WATER_SOUTH_ARROW_WARP]          = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE,
-    [MB_DEEP_SOUTH_WARP]                 = TILE_FLAG_UNUSED,
-    [MB_UNUSED_6F]                       = TILE_FLAG_UNUSED | TILE_FLAG_SURFABLE,
-    [MB_BRIDGE_OVER_POND_LOW]            = TILE_FLAG_UNUSED,
-    [MB_BRIDGE_OVER_POND_MED]            = TILE_FLAG_UNUSED,
-    [MB_BRIDGE_OVER_POND_HIGH]           = TILE_FLAG_UNUSED,
-    [MB_PACIFIDLOG_VERTICAL_LOG_TOP]     = TILE_FLAG_UNUSED,
-    [MB_PACIFIDLOG_VERTICAL_LOG_BOTTOM]  = TILE_FLAG_UNUSED,
-    [MB_PACIFIDLOG_HORIZONTAL_LOG_LEFT]  = TILE_FLAG_UNUSED,
-    [MB_PACIFIDLOG_HORIZONTAL_LOG_RIGHT] = TILE_FLAG_UNUSED,
-    [MB_FORTREE_BRIDGE]                  = TILE_FLAG_UNUSED,
-    [MB_BRIDGE_OVER_POND_MED_EDGE_1]     = TILE_FLAG_UNUSED,
-    [MB_BRIDGE_OVER_POND_MED_EDGE_2]     = TILE_FLAG_UNUSED,
-    [MB_BRIDGE_OVER_POND_HIGH_EDGE_1]    = TILE_FLAG_UNUSED,
-    [MB_BRIDGE_OVER_POND_HIGH_EDGE_2]    = TILE_FLAG_UNUSED,
-    [MB_UNUSED_BRIDGE]                   = TILE_FLAG_UNUSED,
-    [MB_BIKE_BRIDGE_OVER_BARRIER]        = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_SCENERY]             = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_TRAINER_SPOT]        = TILE_FLAG_UNUSED,
-    [MB_HOLDS_SMALL_DECORATION]          = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_BALLOON]             = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_IMPASSABLE]          = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_GLITTER_MAT]         = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_JUMP_MAT]            = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_SPIN_MAT]            = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_SOUND_MAT]           = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_BREAKABLE_DOOR]      = TILE_FLAG_UNUSED,
-    [MB_IMPASSABLE_SOUTH_AND_NORTH]      = TILE_FLAG_UNUSED,
-    [MB_IMPASSABLE_WEST_AND_EAST]        = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_HOLE]                = TILE_FLAG_UNUSED,
-    [MB_HOLDS_LARGE_DECORATION]          = TILE_FLAG_UNUSED,
-    [MB_SECRET_BASE_TV_SHIELD]           = TILE_FLAG_UNUSED,
-    [MB_PLAYER_ROOM_PC_ON]               = TILE_FLAG_UNUSED,
-    [MB_MUDDY_SLOPE]                     = TILE_FLAG_UNUSED,
-    [MB_BUMPY_SLOPE]                     = TILE_FLAG_UNUSED,
-    [MB_CRACKED_FLOOR]                   = TILE_FLAG_UNUSED,
-    [MB_ISOLATED_VERTICAL_RAIL]          = TILE_FLAG_UNUSED,
-    [MB_ISOLATED_HORIZONTAL_RAIL]        = TILE_FLAG_UNUSED,
-    [MB_VERTICAL_RAIL]                   = TILE_FLAG_UNUSED,
-    [MB_HORIZONTAL_RAIL]                 = TILE_FLAG_UNUSED,
+    [MB_POND_WATER]             = TRUE,
+    [MB_DEEP_WATER]             = TRUE,
+    [MB_WATERFALL]              = TRUE,
+    [MB_SOOTOPOLIS_DEEP_WATER]  = TRUE,
+    [MB_OCEAN_WATER]            = TRUE,
+    [MB_NO_SURFACING]           = TRUE,
+    [MB_SEAWEED]                = TRUE,
+    [MB_SEAWEED_NO_SURFACING]   = TRUE,
+    [MB_EASTWARD_CURRENT]       = TRUE,
+    [MB_WESTWARD_CURRENT]       = TRUE,
+    [MB_NORTHWARD_CURRENT]      = TRUE,
+    [MB_SOUTHWARD_CURRENT]      = TRUE,
+    [MB_WATER_DOOR]             = TRUE,
+    [MB_WATER_SOUTH_ARROW_WARP] = TRUE,
+};
+
+static const u8 sTileBitAttributes[32] = {
+    [0] = 0,
+    [1] = 1 << 0,
+    [2] = 1 << 1,
+    [3] = 1 << 2,
+    [4] = 1 << 3,
 };
 
 bool8 MetatileBehavior_IsATile(u8 metatileBehavior)
 {
     return TRUE;
-}
-
-bool8 MetatileBehavior_IsEncounterTile(u8 metatileBehavior)
-{
-    if ((sTileBitAttributes[metatileBehavior] & TILE_FLAG_HAS_ENCOUNTERS))
-        return TRUE;
-    else
-        return FALSE;
 }
 
 bool8 MetatileBehavior_IsJumpEast(u8 metatileBehavior)
@@ -174,7 +67,7 @@ bool8 MetatileBehavior_IsJumpSouth(u8 metatileBehavior)
 
 bool8 MetatileBehavior_IsPokeGrass(u8 metatileBehavior)
 {
-    if (metatileBehavior == MB_TALL_GRASS || metatileBehavior == MB_LONG_GRASS)
+    if (metatileBehavior == MB_TALL_GRASS || metatileBehavior == MB_LONG_GRASS || metatileBehavior == MB_CYCLING_ROAD_PULL_DOWN_GRASS)
         return TRUE;
     else
         return FALSE;
@@ -200,7 +93,6 @@ bool8 MetatileBehavior_IsReflective(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_POND_WATER
      || metatileBehavior == MB_PUDDLE
-     || metatileBehavior == MB_UNUSED_SOOTOPOLIS_DEEP_WATER_2
      || metatileBehavior == MB_ICE
      || metatileBehavior == MB_SOOTOPOLIS_DEEP_WATER
      || metatileBehavior == MB_REFLECTION_UNDER_BRIDGE)
@@ -279,7 +171,7 @@ bool8 MetatileBehavior_IsDeepSouthWarp(u8 metatileBehavior)
 
 bool8 MetatileBehavior_IsSurfableWaterOrUnderwater(u8 metatileBehavior)
 {
-    if ((sTileBitAttributes[metatileBehavior] & TILE_FLAG_SURFABLE))
+    if ((sBehaviorSurfable[metatileBehavior] & 1))
         return TRUE;
     else
         return FALSE;
@@ -344,15 +236,8 @@ bool8 MetatileBehavior_IsForcedMovementTile(u8 metatileBehavior)
      || metatileBehavior == MB_WATERFALL
      || metatileBehavior == MB_ICE
      || metatileBehavior == MB_SECRET_BASE_JUMP_MAT
-     || metatileBehavior == MB_SECRET_BASE_SPIN_MAT)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsIce_2(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_ICE)
+     || metatileBehavior == MB_SECRET_BASE_SPIN_MAT
+     || (metatileBehavior >= MB_SPIN_RIGHT && metatileBehavior <= MB_SPIN_DOWN))
         return TRUE;
     else
         return FALSE;
@@ -473,32 +358,6 @@ bool8 MetatileBehavior_IsSlideEast(u8 metatileBehavior)
 bool8 MetatileBehavior_IsCounter(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_COUNTER)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsPlayerFacingTVScreen(u8 metatileBehavior, u8 playerDir)
-{
-    if (playerDir != DIR_NORTH)
-        return FALSE;
-    else if (metatileBehavior == MB_TELEVISION)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsPC(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_PC)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsCableBoxResults1(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_CABLE_BOX_RESULTS_1)
         return TRUE;
     else
         return FALSE;
@@ -728,7 +587,7 @@ bool8 MetatileBehavior_IsPuddle(u8 metatileBehavior)
 
 bool8 MetatileBehavior_IsTallGrass(u8 metatileBehavior)
 {
-    if (metatileBehavior == MB_TALL_GRASS)
+    if (metatileBehavior == MB_TALL_GRASS || metatileBehavior == MB_CYCLING_ROAD_PULL_DOWN_GRASS)
         return TRUE;
     else
         return FALSE;
@@ -737,14 +596,6 @@ bool8 MetatileBehavior_IsTallGrass(u8 metatileBehavior)
 bool8 MetatileBehavior_IsLongGrass(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_LONG_GRASS)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsBerryTreeSoil(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_BERRY_TREE_SOIL)
         return TRUE;
     else
         return FALSE;
@@ -816,24 +667,6 @@ bool8 MetatileBehavior_IsBridgeOverWaterNoEdge(u8 metatileBehavior)
         return FALSE;
 }
 
-bool8 MetatileBehavior_IsLandWildEncounter(u8 metatileBehavior)
-{
-    if (MetatileBehavior_IsSurfableWaterOrUnderwater(metatileBehavior) == FALSE
-     && MetatileBehavior_IsEncounterTile(metatileBehavior) == TRUE)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsWaterWildEncounter(u8 metatileBehavior)
-{
-    if (MetatileBehavior_IsSurfableWaterOrUnderwater(metatileBehavior) == TRUE
-     && MetatileBehavior_IsEncounterTile(metatileBehavior) == TRUE)
-        return TRUE;
-    else
-        return FALSE;
-}
-
 bool8 MetatileBehavior_IsIndoorEncounter(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_INDOOR_ENCOUNTER)
@@ -852,8 +685,7 @@ bool8 MetatileBehavior_IsMountain(u8 metatileBehavior)
 
 bool8 MetatileBehavior_IsDiveable(u8 metatileBehavior)
 {
-    if (metatileBehavior == MB_INTERIOR_DEEP_WATER
-     || metatileBehavior == MB_DEEP_WATER
+    if (metatileBehavior == MB_DEEP_WATER
      || metatileBehavior == MB_SOOTOPOLIS_DEEP_WATER)
         return TRUE;
     else
@@ -905,17 +737,7 @@ bool8 MetatileBehavior_IsCrackedIce(u8 metatileBehavior)
 bool8 MetatileBehavior_IsDeepOrOceanWater(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_OCEAN_WATER
-     || metatileBehavior == MB_INTERIOR_DEEP_WATER
      || metatileBehavior == MB_DEEP_WATER)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 Unref_MetatileBehavior_IsUnusedSootopolisWater(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_UNUSED_SOOTOPOLIS_DEEP_WATER
-     || metatileBehavior == MB_UNUSED_SOOTOPOLIS_DEEP_WATER_2)
         return TRUE;
     else
         return FALSE;
@@ -1051,54 +873,6 @@ bool8 MetatileBehavior_IsPacifidlogLog(u8 metatileBehavior)
         return FALSE;
 }
 
-bool8 MetatileBehavior_IsTrickHousePuzzleDoor(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_TRICK_HOUSE_PUZZLE_DOOR)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsRegionMap(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_REGION_MAP)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsClosedSootopolisDoor(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_CLOSED_SOOTOPOLIS_DOOR)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsSkyPillarClosedDoor(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_SKY_PILLAR_CLOSED_DOOR)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsRoulette(u8 metatileBehavior) // unused
-{
-    if (metatileBehavior == MB_ROULETTE)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsPokeblockFeeder(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_POKEBLOCK_FEEDER)
-        return TRUE;
-    else
-        return FALSE;
-}
-
 bool8 MetatileBehavior_IsSecretBaseJumpMat(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_SECRET_BASE_JUMP_MAT)
@@ -1153,23 +927,6 @@ bool8 MetatileBehavior_IsUnionRoomWarp(u8 metatileBehavior)
 bool8 MetatileBehavior_IsMossdeepGymWarp(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_MOSSDEEP_GYM_WARP)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-
-bool8 MetatileBehavior_IsSurfableFishableWater(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_POND_WATER
-     || metatileBehavior == MB_OCEAN_WATER
-     || metatileBehavior == MB_INTERIOR_DEEP_WATER
-     || metatileBehavior == MB_DEEP_WATER
-     || metatileBehavior == MB_SOOTOPOLIS_DEEP_WATER
-     || (metatileBehavior == MB_EASTWARD_CURRENT
-      || metatileBehavior == MB_WESTWARD_CURRENT
-      || metatileBehavior == MB_NORTHWARD_CURRENT
-      || metatileBehavior == MB_SOUTHWARD_CURRENT))
         return TRUE;
     else
         return FALSE;
@@ -1266,81 +1023,6 @@ bool8 MetatileBehavior_IsRunningDisallowed(u8 metatileBehavior)
         return FALSE;
 }
 
-bool8 MetatileBehavior_IsCuttableGrass(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_TALL_GRASS
-     || metatileBehavior == MB_LONG_GRASS
-     || metatileBehavior == MB_ASHGRASS
-     || metatileBehavior == MB_LONG_GRASS_SOUTH_EDGE)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsRunningShoesManual(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_RUNNING_SHOES_INSTRUCTION)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsPictureBookShelf(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_PICTURE_BOOK_SHELF)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsBookShelf(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_BOOKSHELF)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsPokeCenterBookShelf(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_POKEMON_CENTER_BOOKSHELF)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsVase(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_VASE)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsTrashCan(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_TRASH_CAN)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsShopShelf(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_SHOP_SHELF)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsBlueprint(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_BLUEPRINT)
-        return TRUE;
-    else
-        return FALSE;
-}
-
 bool8 MetatileBehavior_IsBattlePyramidWarp(u8 metatileBehavior)
 {
     if (metatileBehavior == MB_BATTLE_PYRAMID_WARP)
@@ -1349,53 +1031,38 @@ bool8 MetatileBehavior_IsBattlePyramidWarp(u8 metatileBehavior)
         return FALSE;
 }
 
-bool8 MetatileBehavior_IsPlayerFacingWirelessBoxResults(u8 tile, u8 playerDir)
+bool32 TestMetatileAttributeBit(u8 attr, u8 bitmask)
 {
-    if (playerDir != CONNECTION_NORTH) // if the player isn't facing north, forget about it.
-        return FALSE;
-    else if (tile == MB_WIRELESS_BOX_RESULTS) // is the player's north tile the monitor with results?
+    return sTileBitAttributes[attr] & bitmask;
+}
+
+bool8 MetatileBehavior_IsSpinRight(u8 metatileBehavior)
+{
+    if (metatileBehavior == MB_SPIN_RIGHT)
         return TRUE;
     else
         return FALSE;
 }
 
-bool8 MetatileBehavior_IsCableBoxResults2(u8 tile, u8 playerDir)
+bool8 MetatileBehavior_IsSpinLeft(u8 metatileBehavior)
 {
-    if (playerDir != CONNECTION_NORTH) // if the player isn't facing north, forget about it.
-        return FALSE;
-    else if (tile == MB_CABLE_BOX_RESULTS_2) // is the player's north tile the monitor with results?
+    if (metatileBehavior == MB_SPIN_LEFT)
         return TRUE;
     else
         return FALSE;
 }
 
-bool8 MetatileBehavior_IsQuestionnaire(u8 metatileBehavior)
+bool8 MetatileBehavior_IsSpinUp(u8 metatileBehavior)
 {
-    if (metatileBehavior == MB_QUESTIONNAIRE)
+    if (metatileBehavior == MB_SPIN_UP)
         return TRUE;
     else
         return FALSE;
 }
 
-bool8 MetatileBehavior_IsLongGrass_Duplicate(u8 metatileBehavior)
+bool8 MetatileBehavior_IsSpinDown(u8 metatileBehavior)
 {
-    if (metatileBehavior == MB_LONG_GRASS)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsLongGrassSouthEdge(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_LONG_GRASS_SOUTH_EDGE)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-bool8 MetatileBehavior_IsTrainerHillTimer(u8 metatileBehavior)
-{
-    if (metatileBehavior == MB_TRAINER_HILL_TIMER)
+    if (metatileBehavior == MB_SPIN_DOWN)
         return TRUE;
     else
         return FALSE;
