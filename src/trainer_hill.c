@@ -31,6 +31,7 @@
 #include "constants/trainers.h"
 #include "constants/trainer_hill.h"
 #include "constants/trainer_types.h"
+#include "field_player_avatar.h"
 
 #define HILL_MAX_TIME 215999 // 60 * 60 * 60 - 1
 
@@ -253,7 +254,7 @@ static const u8 *const sModeStrings[NUM_TRAINER_HILL_MODES] =
 
 static const struct ObjectEventTemplate sTrainerObjectEventTemplate =
 {
-    .graphicsId = OBJ_EVENT_GFX_RIVAL_BRENDAN_NORMAL,
+    .graphicsId = OBJ_EVENT_GFX_BRENDAN_NORMAL,
     .elevation = 3,
     .movementType = MOVEMENT_TYPE_LOOK_AROUND,
     .movementRangeX = 1,

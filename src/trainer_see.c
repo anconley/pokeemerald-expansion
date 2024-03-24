@@ -193,7 +193,7 @@ static const union AnimCmd *const sSpriteAnimTable_Icons[] =
 static const struct SpriteTemplate sSpriteTemplate_ExclamationQuestionMark =
 {
     .tileTag = TAG_NONE,
-    .paletteTag = TAG_NONE,
+    .paletteTag = FLDEFF_PAL_TAG_ARROW,
     .oam = &sOamData_Icons,
     .anims = sSpriteAnimTable_Icons,
     .images = sSpriteImageTable_ExclamationQuestionMark,
@@ -492,6 +492,7 @@ static bool8 TrainerExclamationMark(u8 taskId, struct Task *task, struct ObjectE
     FieldEffectStart(FLDEFF_EXCLAMATION_MARK_ICON);
     direction = GetFaceDirectionMovementAction(trainerObj->facingDirection);
     ObjectEventSetHeldMovement(trainerObj, direction);
+    gSpecialVar_TextColor = GetObjectEventGraphicsInfo(trainerObj->graphicsId)->textColor;
     task->tFuncId++; // TRSEE_EXCLAMATION_WAIT
     return TRUE;
 }
@@ -746,12 +747,7 @@ u8 FldEff_HeartIcon(void)
     u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_HeartIcon, 0, 0, 0x52);
 
     if (spriteId != MAX_SPRITES)
-    {
-        struct Sprite *sprite = &gSprites[spriteId];
-
-        SetIconSpriteData(sprite, FLDEFF_HEART_ICON, 0);
-        sprite->oam.paletteNum = 2;
-    }
+        SetIconSpriteData(&gSprites[spriteId], FLDEFF_HEART_ICON, 0);
 
     return 0;
 }
