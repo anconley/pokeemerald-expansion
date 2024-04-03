@@ -63,13 +63,12 @@ enum ReflectionTypes
 #define GROUND_EFFECT_FLAG_PUDDLE                (1 << 10)
 #define GROUND_EFFECT_FLAG_SAND_PILE             (1 << 11)
 #define GROUND_EFFECT_FLAG_LAND_IN_TALL_GRASS    (1 << 12)
-#define GROUND_EFFECT_FLAG_LAND_IN_LONG_GRASS    (1 << 13)
-#define GROUND_EFFECT_FLAG_LAND_IN_SHALLOW_WATER (1 << 14)
-#define GROUND_EFFECT_FLAG_LAND_IN_DEEP_WATER    (1 << 15)
-#define GROUND_EFFECT_FLAG_LAND_ON_NORMAL_GROUND (1 << 16)
-#define GROUND_EFFECT_FLAG_SHORT_GRASS           (1 << 17)
-#define GROUND_EFFECT_FLAG_HOT_SPRINGS           (1 << 18)
-#define GROUND_EFFECT_FLAG_SEAWEED               (1 << 19)
+#define GROUND_EFFECT_FLAG_LAND_IN_SHALLOW_WATER (1 << 13)
+#define GROUND_EFFECT_FLAG_LAND_IN_DEEP_WATER    (1 << 14)
+#define GROUND_EFFECT_FLAG_LAND_ON_NORMAL_GROUND (1 << 15)
+#define GROUND_EFFECT_FLAG_SHORT_GRASS           (1 << 16)
+#define GROUND_EFFECT_FLAG_HOT_SPRINGS           (1 << 17)
+#define GROUND_EFFECT_FLAG_SEAWEED               (1 << 18)
 
 struct StepAnimTable
 {
@@ -170,6 +169,7 @@ u8 GetJumpInPlaceTurnAroundMovementAction(u32);
 u8 GetAcroWheelieInPlaceDirectionMovementAction(u32);
 u8 GetAcroPopWheelieMoveDirectionMovementAction(u32);
 u8 GetAcroWheelieMoveDirectionMovementAction(u32);
+u8 GetAcroWheelieMoveDirectionOnStairsMovementAction(u32);
 u8 GetAcroEndWheelieMoveDirectionMovementAction(u32);
 u8 GetFishingDirectionAnimNum(u8 direction);
 u8 GetAcroWheelieDirectionAnimNum(u8 direction);
