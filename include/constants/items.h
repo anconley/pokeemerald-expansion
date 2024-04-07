@@ -1049,6 +1049,7 @@
 // Secondary IDs for bikes
 #define MACH_BIKE 0
 #define ACRO_BIKE 1
+#define FRLG_BIKE 2 // The bike from FRLG. Added for the handling of slopes on FRLG's Cycling Road.
 
 // Item parameters for EXP Candies
 #define EXP_100   1
