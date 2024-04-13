@@ -305,6 +305,7 @@ static void Task_RecordMixing_SoundEffect(u8 taskId)
 
 #undef tCounter
 
+#define tSpriteId    data[1]
 #define tTimer       data[8]
 #define tLinkTaskId  data[10]
 #define tSoundTaskId data[15]
@@ -323,7 +324,7 @@ static void Task_RecordMixing_Main(u8 taskId)
         VarSet(VAR_TEMP_MIXED_RECORDS, 1);
         sReadyToReceive = FALSE;
         PrepareExchangePacket();
-        CreateRecordMixingLights();
+        tSpriteId = CreateRecordMixingLights();
         tState = 1;
         tLinkTaskId = CreateTask(Task_MixingRecordsRecv, 80);
         tSoundTaskId = CreateTask(Task_RecordMixing_SoundEffect, 81);
@@ -331,9 +332,12 @@ static void Task_RecordMixing_Main(u8 taskId)
     case 1: // wait for Task_MixingRecordsRecv
         if (!gTasks[tLinkTaskId].isActive)
         {
+            struct Sprite *sprite;
             tState = 2;
             FlagSet(FLAG_SYS_MIX_RECORD);
-            DestroyRecordMixingLights();
+            sprite = &gSprites[tSpriteId];
+            FreeSpritePalette(sprite);
+            DestroySprite(sprite);
             DestroyTask(tSoundTaskId);
         }
         break;
@@ -373,6 +377,7 @@ static void Task_RecordMixing_Main(u8 taskId)
     }
 }
 
+#undef tSpriteId
 #undef tTimer
 #undef tLinkTaskId
 #undef tSoundTaskId

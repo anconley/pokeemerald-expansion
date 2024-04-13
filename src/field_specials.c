@@ -1572,10 +1572,11 @@ u16 SetPacifidlogTMReceivedDay(void)
 
 bool8 MonOTNameNotPlayer(void)
 {
-    if (GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_LANGUAGE) != GAME_LANGUAGE)
+    struct Pokemon *pokemon = &gPlayerParty[gSpecialVar_0x8004];
+    if (GetMonData(pokemon, MON_DATA_LANGUAGE) != GAME_LANGUAGE)
         return TRUE;
 
-    GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_OT_NAME, gStringVar1);
+    GetMonData(pokemon, MON_DATA_OT_NAME, gStringVar1);
 
     if (!StringCompare(gSaveBlock2Ptr->playerName, gStringVar1))
         return FALSE;
@@ -1972,12 +1973,13 @@ void BufferVarsForIVRater(void)
     u8 i;
     u32 ivStorage[NUM_STATS];
 
-    ivStorage[STAT_HP] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_HP_IV);
-    ivStorage[STAT_ATK] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_ATK_IV);
-    ivStorage[STAT_DEF] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_DEF_IV);
-    ivStorage[STAT_SPEED] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPEED_IV);
-    ivStorage[STAT_SPATK] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPATK_IV);
-    ivStorage[STAT_SPDEF] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPDEF_IV);
+    struct Pokemon *pokemon = &gPlayerParty[gSpecialVar_0x8004];
+    ivStorage[STAT_HP] = GetMonData(pokemon, MON_DATA_HP_IV);
+    ivStorage[STAT_ATK] = GetMonData(pokemon, MON_DATA_ATK_IV);
+    ivStorage[STAT_DEF] = GetMonData(pokemon, MON_DATA_DEF_IV);
+    ivStorage[STAT_SPEED] = GetMonData(pokemon, MON_DATA_SPEED_IV);
+    ivStorage[STAT_SPATK] = GetMonData(pokemon, MON_DATA_SPATK_IV);
+    ivStorage[STAT_SPDEF] = GetMonData(pokemon, MON_DATA_SPDEF_IV);
 
     gSpecialVar_0x8005 = 0;
 
@@ -3212,17 +3214,17 @@ static const u16 sDeoxysRockPalettes[DEOXYS_ROCK_LEVELS][16] = {
 };
 
 static const u8 sDeoxysRockCoords[DEOXYS_ROCK_LEVELS][2] = {
-    { 15, 12 },
-    { 11, 14 },
-    { 15,  8 },
-    { 19, 14 },
-    { 12, 11 },
-    { 18, 11 },
-    { 15, 14 },
-    { 11, 14 },
-    { 19, 14 },
-    { 15, 15 },
-    { 15, 10 },
+    { 14, 11 },
+    { 10, 13 },
+    { 14,  7 },
+    { 18, 13 },
+    { 11, 10 },
+    { 17, 10 },
+    { 14, 13 },
+    { 10, 13 },
+    { 18, 13 },
+    { 14, 14 },
+    { 14,  9 },
 };
 
 static void Task_DeoxysRockInteraction(u8 taskId)

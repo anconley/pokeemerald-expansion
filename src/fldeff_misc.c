@@ -62,7 +62,6 @@ static void SpriteCB_SandPillar_BreakBase(struct Sprite *);
 static void SpriteCB_SandPillar_End(struct Sprite *);
 
 static const u8 sSecretPowerCave_Gfx[] = INCBIN_U8("graphics/field_effects/pics/secret_power_cave.4bpp");
-static const u8 sFiller[32] = {0};
 static const u16 sSecretPowerCave_Pal[] = INCBIN_U16("graphics/field_effects/palettes/secret_power_cave.gbapal");
 static const u8 sSecretPowerShrub_Gfx[] = INCBIN_U8("graphics/field_effects/pics/secret_power_shrub.4bpp");
 static const u8 sSecretPowerTree_Gfx[] = INCBIN_U8("graphics/field_effects/pics/secret_power_tree.4bpp");
@@ -86,16 +85,6 @@ static const struct OamData sOam_SecretPower =
 };
 
 static const union AnimCmd sAnim_SecretPowerCave[] =
-{
-    ANIMCMD_FRAME(0, 8),
-    ANIMCMD_FRAME(1, 8),
-    ANIMCMD_FRAME(2, 8),
-    ANIMCMD_FRAME(3, 8),
-    ANIMCMD_FRAME(4, 8),
-    ANIMCMD_END,
-};
-
-static const union AnimCmd sAnim_VineDropLeft[] =
 {
     ANIMCMD_FRAME(0, 8),
     ANIMCMD_FRAME(1, 8),
@@ -135,32 +124,12 @@ static const union AnimCmd sAnim_VineRiseRight[] =
     ANIMCMD_END,
 };
 
-static const union AnimCmd sAnim_SecretPowerShrub[] =
-{
-    ANIMCMD_FRAME(0, 8),
-    ANIMCMD_FRAME(1, 8),
-    ANIMCMD_FRAME(2, 8),
-    ANIMCMD_FRAME(3, 8),
-    ANIMCMD_FRAME(4, 8),
-    ANIMCMD_END,
-};
-
-static const union AnimCmd *const sAnimTable_SecretPowerCave[] =
+static const union AnimCmd *const sAnimTable_SecretPower[] =
 {
     sAnim_SecretPowerCave,
-};
-
-static const union AnimCmd *const sAnimTable_SecretPowerTree[] =
-{
-    sAnim_VineDropLeft,
     sAnim_VineRiseLeft,
     sAnim_VineDropRight,
     sAnim_VineRiseRight,
-};
-
-static const union AnimCmd *const sAnimTable_SecretPowerShrub[] =
-{
-    sAnim_SecretPowerShrub,
 };
 
 static const struct SpriteFrameImage sPicTable_SecretPowerCave[] =
@@ -183,7 +152,7 @@ static const struct SpriteTemplate sSpriteTemplate_SecretPowerCave =
     .tileTag = TAG_NONE,
     .paletteTag = FLDEFF_PAL_TAG_SECRET_POWER_TREE,
     .oam = &sOam_SecretPower,
-    .anims = sAnimTable_SecretPowerCave,
+    .anims = sAnimTable_SecretPower,
     .images = sPicTable_SecretPowerCave,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCB_CaveEntranceInit,
@@ -194,7 +163,7 @@ static const struct SpriteTemplate sSpriteTemplate_SecretPowerTree =
     .tileTag = TAG_NONE,
     .paletteTag = FLDEFF_PAL_TAG_SECRET_POWER_PLANT,
     .oam = &sOam_SecretPower,
-    .anims = sAnimTable_SecretPowerTree,
+    .anims = sAnimTable_SecretPower,
     .images = sPicTable_SecretPowerTree,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCB_TreeEntranceInit,
@@ -205,7 +174,7 @@ static const struct SpriteTemplate sSpriteTemplate_SecretPowerShrub =
     .tileTag = TAG_NONE,
     .paletteTag = FLDEFF_PAL_TAG_SECRET_POWER_PLANT,
     .oam = &sOam_SecretPower,
-    .anims = sAnimTable_SecretPowerShrub,
+    .anims = sAnimTable_SecretPower,
     .images = sPicTable_SecretPowerShrub,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCB_ShrubEntranceInit,
@@ -884,16 +853,6 @@ static void DoBalloonSoundEffect(s16 metatileId)
     }
 }
 
-bool8 FldEff_Nop47(void)
-{
-    return FALSE;
-}
-
-bool8 FldEff_Nop48(void)
-{
-    return FALSE;
-}
-
 static void DoSecretBaseBreakableDoorEffect(s16 x, s16 y)
 {
     PlaySE(SE_BREAKABLE_DOOR);
@@ -1292,18 +1251,4 @@ u8 CreateRecordMixingLights(void)
         sprite->y += 2;
     }
     return spriteId;
-}
-
-void DestroyRecordMixingLights(void)
-{
-    int i;
-
-    for (i = 0; i < MAX_SPRITES; i++)
-    {
-        if (gSprites[i].template == &sSpriteTemplate_RecordMixLights)
-        {
-            FreeSpritePalette(&gSprites[i]);
-            DestroySprite(&gSprites[i]);
-        }
-    }
 }

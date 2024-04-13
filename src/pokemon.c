@@ -55,6 +55,7 @@
 #include "constants/songs.h"
 #include "constants/trainers.h"
 #include "constants/union_room.h"
+#include "region_map.h"
 #include "constants/weather.h"
 
 #define FRIENDSHIP_EVO_THRESHOLD ((P_FRIENDSHIP_EVO_THRESHOLD >= GEN_9) ? 160 : 220)
@@ -5383,6 +5384,22 @@ bool32 IsSpeciesInHoennDex(u16 species)
 
 u16 GetBattleBGM(void)
 {
+    static const u16 sRegionalBattleMusic[NUM_REGION][3] =
+    {
+        [REGION_HOENN] =
+        {
+            MUS_VS_GYM_LEADER,
+            MUS_VS_TRAINER,
+            MUS_VS_WILD
+        },
+        [REGION_KANTO] =
+        {
+            MUS_RG_VS_GYM_LEADER,
+            MUS_RG_VS_TRAINER,
+            MUS_RG_VS_WILD
+        }
+    };
+    const u16 *regionalBattleMusic = sRegionalBattleMusic[GetCurrentRegion()];
     if (gBattleTypeFlags & BATTLE_TYPE_LEGENDARY)
     {
         switch (GetMonData(&gEnemyParty[0], MON_DATA_SPECIES, NULL))
@@ -5403,15 +5420,13 @@ u16 GetBattleBGM(void)
             return MUS_RG_VS_LEGEND;
         }
     }
-    else if (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK))
-        return MUS_VS_TRAINER;
     else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
     {
         u8 trainerClass;
 
         if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
             trainerClass = GetFrontierOpponentClass(gTrainerBattleOpponent_A);
-        else if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
+        else if (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_TRAINER_HILL))
             trainerClass = TRAINER_CLASS_EXPERT;
         else
             trainerClass = GetTrainerClassFromId(gTrainerBattleOpponent_A);
@@ -5427,14 +5442,14 @@ u16 GetBattleBGM(void)
         case TRAINER_CLASS_MAGMA_ADMIN:
             return MUS_VS_AQUA_MAGMA;
         case TRAINER_CLASS_LEADER:
-            return MUS_VS_GYM_LEADER;
+            return regionalBattleMusic[0];
         case TRAINER_CLASS_CHAMPION:
             return MUS_VS_CHAMPION;
         case TRAINER_CLASS_RIVAL:
             if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
                 return MUS_VS_RIVAL;
             if (!StringCompare(GetTrainerNameFromId(gTrainerBattleOpponent_A), gText_BattleWallyName))
-                return MUS_VS_TRAINER;
+                return regionalBattleMusic[1];
             return MUS_VS_RIVAL;
         case TRAINER_CLASS_ELITE_FOUR:
             return MUS_VS_ELITE_FOUR;
@@ -5447,11 +5462,14 @@ u16 GetBattleBGM(void)
         case TRAINER_CLASS_PYRAMID_KING:
             return MUS_VS_FRONTIER_BRAIN;
         default:
-            return MUS_VS_TRAINER;
+            if (gBattleTypeFlags & (BATTLE_TYPE_RECORDED | BATTLE_TYPE_RECORDED_LINK))
+                return MUS_VS_TRAINER; // Just so recorded battles use Hoenn's trainer battle
+            else
+                return regionalBattleMusic[1];
         }
     }
     else
-        return MUS_VS_WILD;
+        return regionalBattleMusic[2];
 }
 
 void PlayBattleBGM(void)

@@ -29,7 +29,7 @@ extern struct MapPosition gPlayerFacingPosition;
 extern const u8 FarawayIsland_Interior_EventScript_HideMewWhenGrassCut[];
 
 extern const u8 gFieldEffectPic_CutGrass[];
-extern const u16 gFieldEffectPal_CutGrass[];
+extern const u16 gFieldEffectObjectPalette3[];
 
 // cut 'square' defines
 #define CUT_NORMAL_SIDE 3
@@ -59,6 +59,9 @@ static const u16 sCutGrassMetatileMapping[][2] = {
         [CUT_GRASS_TOP]    = METATILE_General_Grass
     }, {
         [CUT_GRASS_BOTTOM] = METATILE_General_LongGrass,
+        [CUT_GRASS_TOP]    = METATILE_General_Grass
+    }, {
+        [CUT_GRASS_BOTTOM] = METATILE_General_LongGrassCovered,
         [CUT_GRASS_TOP]    = METATILE_General_Grass
     }, {
         [CUT_GRASS_BOTTOM] = METATILE_General_TallGrass,
@@ -156,12 +159,12 @@ static const struct SpriteFrameImage sSpriteImageTable_CutGrass[] =
     {gFieldEffectPic_CutGrass, 0x20},
 };
 
-const struct SpritePalette gSpritePalette_CutGrass = {gFieldEffectPal_CutGrass, FLDEFF_PAL_TAG_CUT_GRASS};
+const struct SpritePalette gSpritePalette_GeneralFieldEffect3 = {gFieldEffectObjectPalette3, FLDEFF_PAL_TAG_GENERAL_3};
 
 static const struct SpriteTemplate sSpriteTemplate_CutGrass =
 {
     .tileTag = TAG_NONE,
-    .paletteTag = FLDEFF_PAL_TAG_CUT_GRASS,
+    .paletteTag = FLDEFF_PAL_TAG_GENERAL_3,
     .oam = &sOamData_CutGrass,
     .anims = sSpriteAnimTable_CutGrass,
     .images = sSpriteImageTable_CutGrass,
@@ -322,11 +325,11 @@ static void SetCutGrassMetatile(s32 x, s32 y)
     while (1)
     {
         const u16 *metatileMapping = sCutGrassMetatileMapping[i];
-        if (metatileMapping[0] != 0xFFFF)
+        if (metatileMapping[CUT_GRASS_BOTTOM] != 0xFFFF)
         {
-            if (metatileMapping[0] == metatileId)
+            if (metatileMapping[CUT_GRASS_BOTTOM] == metatileId)
             {
-                MapGridSetMetatileIdAt(x, y, metatileMapping[1]);
+                MapGridSetMetatileIdAt(x, y, metatileMapping[CUT_GRASS_TOP]);
                 break;
             }
             i++;
@@ -378,7 +381,7 @@ static u32 GetCutGrassMetatile(s32 x, s32 y, bool32 isTop)
 {   
     u32 i;
     u32 metatileId = MapGridGetMetatileIdAt(x, y);
-    for (i = 0; sCutGrassMetatileMapping[i][0] != 0xFFFF; i++)
+    for (i = 0; sCutGrassMetatileMapping[i][CUT_GRASS_BOTTOM] != 0xFFFF; i++)
     {
         const u16 *metatileMapping = sCutGrassMetatileMapping[i];
         if (metatileMapping[!isTop] == metatileId)
@@ -401,6 +404,8 @@ void FixLongGrassMetatilesWindowBottom(s32 x, s32 y)
         u32 metatileBehavior = MapGridGetMetatileBehaviorAt(x, y + 1);
         if (metatileBehavior == MB_LONG_GRASS_SOUTH_EDGE)
             SetCutGrassMetatile(x, y + 1);
+        else if (metatileBehavior == MB_LONG_GRASS_COVERED)
+            MapGridSetMetatileIdAt(x, y + 1, METATILE_General_LongGrass);
     }
 }
 

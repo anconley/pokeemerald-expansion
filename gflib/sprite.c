@@ -148,7 +148,8 @@ static const struct Sprite sDummySprite =
     .oam = DUMMY_OAM_DATA,
     .anims = gDummySpriteAnimTable,
     .affineAnims = gDummySpriteAffineAnimTable,
-    .template = &gDummySpriteTemplate,
+    .tileTag = TAG_NONE,
+    .paletteTag = TAG_NONE,
     .callback = SpriteCallbackDummy,
     .x = DISPLAY_WIDTH + 64,
     .y = DISPLAY_HEIGHT,
@@ -489,14 +490,14 @@ u32 CreateSpriteAt(u32 index, const struct SpriteTemplate *template, s16 x, s16 
     sprite->oam = *template->oam;
     sprite->anims = template->anims;
     sprite->affineAnims = template->affineAnims;
-    sprite->template = template;
     sprite->callback = template->callback;
     sprite->x = x;
     sprite->y = y;
 
     CalcCenterToCornerVec(sprite, sprite->oam.shape, sprite->oam.size, sprite->oam.affineMode);
 
-    if (template->tileTag == TAG_NONE)
+    sprite->tileTag = template->tileTag;
+    if (sprite->tileTag == TAG_NONE)
     {
         s16 tileNum;
         sprite->images = template->images;
@@ -512,15 +513,16 @@ u32 CreateSpriteAt(u32 index, const struct SpriteTemplate *template, s16 x, s16 
     }
     else
     {
-        sprite->sheetTileStart = GetSpriteTileStartByTag(template->tileTag);
+        sprite->sheetTileStart = GetSpriteTileStartByTag(sprite->tileTag);
         SetSpriteSheetFrameTileNum(sprite);
     }
 
     if (sprite->oam.affineMode & ST_OAM_AFFINE_ON_MASK)
         InitSpriteAffineAnim(sprite);
 
-    if (template->paletteTag != TAG_NONE)
-        sprite->oam.paletteNum = IndexOfSpritePaletteTag(template->paletteTag);
+    sprite->paletteTag = template->paletteTag;
+    if (sprite->paletteTag != TAG_NONE)
+        sprite->oam.paletteNum = IndexOfSpritePaletteTag(sprite->paletteTag);
 
     return index;
 }
@@ -805,25 +807,19 @@ void ResetAllSprites(void)
 
 void FreeSpriteTiles(struct Sprite *sprite)
 {
-// UB: template pointer may point to freed temporary storage
-#ifdef UBFIX
-    if (!sprite || !sprite->template)
+    if (!sprite)
         return;
-#endif
 
-    if (sprite->template->tileTag != TAG_NONE)
-        FreeSpriteTilesByTag(sprite->template->tileTag);
+    if (sprite->tileTag != TAG_NONE)
+        FreeSpriteTilesByTag(sprite->tileTag);
 }
 
 void FreeSpritePalette(struct Sprite *sprite)
 {
-// UB: template pointer may point to freed temporary storage
-#ifdef UBFIX
-    if (!sprite || !sprite->template)
+    if (!sprite)
         return;
-#endif
 
-    FreeSpritePaletteByTag(sprite->template->paletteTag);
+    FreeSpritePaletteByTag(sprite->paletteTag);
 }
 
 void FreeSpriteOamMatrix(struct Sprite *sprite)

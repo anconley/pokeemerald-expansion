@@ -67,6 +67,7 @@
 #include "constants/songs.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
+#include "region_map.h"
 #include "field_player_avatar.h"
 
 struct CableClubPlayer
@@ -112,11 +113,8 @@ static bool32 ReturnToFieldLocal(u8 *);
 static bool32 ReturnToFieldLink(u8 *);
 static void InitObjectEventsLink(void);
 static void InitObjectEventsLocal(void);
-static void InitOverworldGraphicsRegisters(void);
 static u8 GetSpriteForLinkedPlayer(u8);
 static u16 KeyInterCB_SendNothing(u32);
-static void ResetMirageTowerAndSaveBlockPtrs(void);
-static void ResetScreenForMapLoad(void);
 static void OffsetCameraFocusByLinkPlayerId(void);
 static void SpawnLinkPlayers(void);
 static void SetCameraToTrackGuestPlayer(void);
@@ -357,6 +355,12 @@ static void (*const sMovementStatusHandler[])(struct LinkPlayerObjectEvent *, st
     MovementStatusHandler_TryAdvanceScript,
 };
 
+const u16 gRegionalSurfMusic[NUM_REGION] =
+{
+    [REGION_HOENN] = MUS_SURF,
+    [REGION_KANTO] = MUS_RG_SURF,
+};
+
 // code
 void DoWhiteOut(void)
 {
@@ -549,15 +553,6 @@ void SetObjEventTemplateMovementType(u8 localId, u8 movementType)
             return;
         }
     }
-}
-
-static void InitMapView(void)
-{
-    ResetFieldCamera();
-    CopyMapTilesetsToVram(gMapHeader.mapLayout);
-    LoadMapTilesetPalettes(gMapHeader.mapLayout);
-    DrawWholeMapView();
-    InitTilesetAnimations();
 }
 
 const struct MapLayout *GetMapLayout(u16 mapLayoutId)
@@ -1188,7 +1183,7 @@ void Overworld_PlaySpecialMapMusic(void)
         else if (GetCurrentMapType() == MAP_TYPE_UNDERWATER)
             music = MUS_UNDERWATER;
         else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-            music = MUS_SURF;
+            music = gRegionalSurfMusic[GetCurrentRegion()];
     }
 
     if (music != GetCurrentMapMusic())
@@ -1213,10 +1208,11 @@ static void TransitionMapMusic(void)
         u16 currentMusic = GetCurrentMapMusic();
         if (newMusic != MUS_ABNORMAL_WEATHER && newMusic != MUS_NONE)
         {
-            if (currentMusic == MUS_UNDERWATER || currentMusic == MUS_SURF)
+            u16 surfMusic = gRegionalSurfMusic[GetCurrentRegion()];
+            if (currentMusic == MUS_UNDERWATER || currentMusic == surfMusic)
                 return;
             if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-                newMusic = MUS_SURF;
+                newMusic = surfMusic;
         }
         if (newMusic != currentMusic)
         {
@@ -1257,7 +1253,7 @@ void TryFadeOutOldMapMusic(void)
     u16 warpMusic = GetWarpDestinationMusic();
     if (FlagGet(FLAG_DONT_TRANSITION_MUSIC) != TRUE && warpMusic != GetCurrentMapMusic())
     {
-        if (currentMusic == MUS_SURF
+        if (currentMusic == gRegionalSurfMusic[GetCurrentRegion()]
             && VarGet(VAR_SKY_PILLAR_STATE) == 2
             && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(SOOTOPOLIS_CITY)
             && gSaveBlock1Ptr->location.mapNum == MAP_NUM(SOOTOPOLIS_CITY)
@@ -1436,8 +1432,22 @@ u8 GetCurrentMapBattleScene(void)
     return Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum)->battleType;
 }
 
-static void InitOverworldBgs(void)
+static void InitOverworldBgs(bool8 resetHeap)
 {
+    if (resetHeap)
+    {
+        ClearMirageTowerPulseBlend();
+        MoveSaveBlocks_ResetHeap();
+
+        SetGpuReg(REG_OFFSET_DISPCNT, 0);
+        ScanlineEffect_Stop();
+
+        DmaClear16(3, PLTT + 2, PLTT_SIZE - 2);
+        DmaFillLarge16(3, 0, (void *)VRAM, VRAM_SIZE, 0x1000);
+        ResetOamRange(0, 128);
+        LoadOam();
+    }
+    ResetBgsAndClearDma3BusyFlags(FALSE);
     InitBgsFromTemplates(0, sOverworldBgTemplates, ARRAY_COUNT(sOverworldBgTemplates));
     SetBgAttribute(1, BG_ATTR_MOSAIC, 1);
     SetBgAttribute(2, BG_ATTR_MOSAIC, 1);
@@ -1449,6 +1459,8 @@ static void InitOverworldBgs(void)
     SetBgTilemapBuffer(2, gOverworldTilemapBuffer_Bg2);
     SetBgTilemapBuffer(3, gOverworldTilemapBuffer_Bg3);
     InitStandardTextBoxWindows();
+    InitTextBoxGfxAndPrinters();
+    InitFieldMessageBox();
 }
 
 void CleanupOverworldWindowsAndTilemaps(void)
@@ -1805,11 +1817,8 @@ static void FieldClearVBlankHBlankCallbacks(void)
     }
     else
     {
-        u16 savedIme = REG_IME;
-        REG_IME = 0;
-        REG_IE &= ~INTR_FLAG_HBLANK;
-        REG_IE |= INTR_FLAG_VBLANK;
-        REG_IME = savedIme;
+        DisableInterrupts(INTR_FLAG_HBLANK);
+        EnableInterrupts(INTR_FLAG_VBLANK);
     }
 
     SetVBlankCallback(NULL);
@@ -1831,32 +1840,14 @@ static void VBlankCB_Field(void)
     TransferTilesetAnimsBuffer();
 }
 
-static void InitCurrentFlashLevelScanlineEffect(void)
-{
-    u8 flashLevel;
-
-    if (InBattlePyramid_())
-    {
-        WriteBattlePyramidViewScanlineEffectBuffer();
-        ScanlineEffect_SetParams(sFlashEffectParams);
-    }
-    else if ((flashLevel = GetFlashLevel()))
-    {
-        WriteFlashScanlineEffectBuffer(flashLevel);
-        ScanlineEffect_SetParams(sFlashEffectParams);
-    }
-}
-
 static bool32 LoadMapInStepsLink(u8 *state)
 {
     switch (*state)
     {
     case 0:
-        InitOverworldBgs();
+        InitOverworldBgs(TRUE);
         ScriptContext_Init();
         UnlockPlayerFieldControls();
-        ResetMirageTowerAndSaveBlockPtrs();
-        ResetScreenForMapLoad();
         (*state)++;
         break;
     case 1:
@@ -1875,9 +1866,7 @@ static bool32 LoadMapInStepsLink(u8 *state)
         (*state)++;
         break;
     case 4:
-        InitCurrentFlashLevelScanlineEffect();
-        InitOverworldGraphicsRegisters();
-        InitTextBoxGfxAndPrinters();
+        InitViewGraphics();
         (*state)++;
         break;
     case 5:
@@ -1931,67 +1920,61 @@ static bool32 LoadMapInStepsLocal(u8 *state, bool32 a2)
     switch (*state)
     {
     case 0:
+        InitOverworldBgs(TRUE);
         FieldClearVBlankHBlankCallbacks();
         LoadMapFromWarp(a2);
         (*state)++;
         break;
     case 1:
-        ResetMirageTowerAndSaveBlockPtrs();
-        ResetScreenForMapLoad();
-        (*state)++;
-        break;
-    case 2:
         ResumeMap(a2);
         (*state)++;
         break;
-    case 3:
+    case 2:
         InitObjectEventsLocal();
         SetCameraToTrackPlayer();
         (*state)++;
         break;
-    case 4:
-        InitCurrentFlashLevelScanlineEffect();
-        InitOverworldGraphicsRegisters();
-        InitTextBoxGfxAndPrinters();
+    case 3:
+        InitViewGraphics();
         (*state)++;
         break;
-    case 5:
+    case 4:
         ResetFieldCamera();
         (*state)++;
         break;
-    case 6:
+    case 5:
         CopyPrimaryTilesetToVram(gMapHeader.mapLayout);
         (*state)++;
         break;
-    case 7:
+    case 6:
         CopySecondaryTilesetToVram(gMapHeader.mapLayout);
         (*state)++;
         break;
-    case 8:
+    case 7:
         if (FreeTempTileDataBuffersIfPossible() != TRUE)
         {
             LoadMapTilesetPalettes(gMapHeader.mapLayout);
             (*state)++;
         }
         break;
-    case 9:
+    case 8:
         DrawWholeMapView();
         (*state)++;
         break;
-    case 10:
+    case 9:
         InitTilesetAnimations();
         (*state)++;
         break;
-    case 11:
+    case 10:
         if (gMapHeader.showMapName == TRUE && SecretBaseMapPopupEnabled() == TRUE)
             ShowMapNamePopup();
         (*state)++;
         break;
-    case 12:
+    case 11:
         if (RunFieldCallback())
             (*state)++;
         break;
-    case 13:
+    case 12:
         return TRUE;
     }
 
@@ -2003,8 +1986,7 @@ static bool32 ReturnToFieldLocal(u8 *state)
     switch (*state)
     {
     case 0:
-        ResetMirageTowerAndSaveBlockPtrs();
-        ResetScreenForMapLoad();
+        InitOverworldBgs(TRUE);
         ResumeMap(FALSE);
         InitObjectEventsReturnToField();
         SetCameraToTrackPlayer();
@@ -2012,6 +1994,11 @@ static bool32 ReturnToFieldLocal(u8 *state)
         break;
     case 1:
         InitViewGraphics();
+        ResetFieldCamera();
+        CopyMapTilesetsToVram(gMapHeader.mapLayout);
+        LoadMapTilesetPalettes(gMapHeader.mapLayout);
+        DrawWholeMapView();
+        InitTilesetAnimations();
         TryLoadTrainerHillEReaderPalette();
         (*state)++;
         break;
@@ -2031,9 +2018,8 @@ static bool32 ReturnToFieldLink(u8 *state)
     switch (*state)
     {
     case 0:
+        InitOverworldBgs(TRUE);
         FieldClearVBlankHBlankCallbacks();
-        ResetMirageTowerAndSaveBlockPtrs();
-        ResetScreenForMapLoad();
         (*state)++;
         break;
     case 1:
@@ -2043,13 +2029,11 @@ static bool32 ReturnToFieldLink(u8 *state)
     case 2:
         CreateLinkPlayerSprites();
         InitObjectEventsReturnToField();
-        SetCameraToTrackGuestPlayer_2();
+        SetCameraToTrackGuestPlayer();
         (*state)++;
         break;
     case 3:
-        InitCurrentFlashLevelScanlineEffect();
-        InitOverworldGraphicsRegisters();
-        InitTextBoxGfxAndPrinters();
+        InitViewGraphics();
         (*state)++;
         break;
     case 4:
@@ -2079,7 +2063,7 @@ static bool32 ReturnToFieldLink(u8 *state)
         InitTilesetAnimations();
         (*state)++;
         break;
-    case 11:
+    case 10:
         if (gWirelessCommType != 0)
         {
             LoadWirelessStatusIndicatorSpriteGfx();
@@ -2087,14 +2071,11 @@ static bool32 ReturnToFieldLink(u8 *state)
         }
         (*state)++;
         break;
-    case 12:
+    case 11:
         if (RunFieldCallback())
             (*state)++;
         break;
-    case 10:
-        (*state)++;
-        break;
-    case 13:
+    case 12:
         SetFieldVBlankCallback();
         (*state)++;
         return TRUE;
@@ -2108,33 +2089,23 @@ static void DoMapLoadLoop(u8 *state)
     while (!LoadMapInStepsLocal(state, FALSE));
 }
 
-static void ResetMirageTowerAndSaveBlockPtrs(void)
-{
-    ClearMirageTowerPulseBlend();
-    MoveSaveBlocks_ResetHeap();
-}
-
-static void ResetScreenForMapLoad(void)
-{
-    SetGpuReg(REG_OFFSET_DISPCNT, 0);
-    ScanlineEffect_Stop();
-
-    DmaClear16(3, PLTT + 2, PLTT_SIZE - 2);
-    DmaFillLarge16(3, 0, (void *)VRAM, VRAM_SIZE, 0x1000);
-    ResetOamRange(0, 128);
-    LoadOam();
-}
-
 static void InitViewGraphics(void)
 {
-    InitCurrentFlashLevelScanlineEffect();
-    InitOverworldGraphicsRegisters();
-    InitTextBoxGfxAndPrinters();
-    InitMapView();
-}
+    u8 flashLevel;
 
-static void InitOverworldGraphicsRegisters(void)
-{
+    // Flash level scanline effect
+    if (InBattlePyramid_())
+    {
+        WriteBattlePyramidViewScanlineEffectBuffer();
+        ScanlineEffect_SetParams(sFlashEffectParams);
+    }
+    else if ((flashLevel = GetFlashLevel()))
+    {
+        WriteFlashScanlineEffectBuffer(flashLevel);
+        ScanlineEffect_SetParams(sFlashEffectParams);
+    }
+
+    // Overworld graphics registers
     ClearScheduledBgCopiesToVram();
     ResetTempTileDataBuffers();
     SetGpuReg(REG_OFFSET_MOSAIC, 0);
@@ -2147,10 +2118,15 @@ static void InitOverworldGraphicsRegisters(void)
     SetGpuReg(REG_OFFSET_BLDCNT, gOverworldBackgroundLayerFlags[1] | gOverworldBackgroundLayerFlags[2] | gOverworldBackgroundLayerFlags[3]
                                | BLDCNT_TGT2_OBJ | BLDCNT_EFFECT_BLEND);
     SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(13, 7));
-    InitOverworldBgs();
     ScheduleBgCopyTilemapToVram(1);
     ScheduleBgCopyTilemapToVram(2);
     ScheduleBgCopyTilemapToVram(3);
+    SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_WIN0_ON | DISPCNT_WIN1_ON
+                                | DISPCNT_OBJ_1D_MAP | DISPCNT_HBLANK_INTERVAL);
+    ShowBg(0);
+    ShowBg(1);
+    ShowBg(2);
+    ShowBg(3);
     ChangeBgX(0, 0, BG_COORD_SET);
     ChangeBgY(0, 0, BG_COORD_SET);
     ChangeBgX(1, 0, BG_COORD_SET);
@@ -2159,13 +2135,6 @@ static void InitOverworldGraphicsRegisters(void)
     ChangeBgY(2, 0, BG_COORD_SET);
     ChangeBgX(3, 0, BG_COORD_SET);
     ChangeBgY(3, 0, BG_COORD_SET);
-    SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_WIN0_ON | DISPCNT_WIN1_ON
-                                | DISPCNT_OBJ_1D_MAP | DISPCNT_HBLANK_INTERVAL);
-    ShowBg(0);
-    ShowBg(1);
-    ShowBg(2);
-    ShowBg(3);
-    InitFieldMessageBox();
 }
 
 static void ResumeMap(bool32 a1)
