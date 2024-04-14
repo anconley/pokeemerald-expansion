@@ -32,7 +32,6 @@ extern const struct Tileset gTileset_BattleFrontierOutsideEast;
 extern const struct Tileset gTileset_Building;
 extern const struct Tileset gTileset_Shop;
 extern const struct Tileset gTileset_PokemonCenter;
-extern const struct Tileset gTileset_RG_General;
 extern const struct Tileset gTileset_PetalburgGym;
 extern const struct Tileset gTileset_InsideShip;
 extern const struct Tileset gTileset_BattleFrontier;
@@ -42,6 +41,8 @@ extern const struct Tileset gTileset_BattleArena;
 extern const struct Tileset gTileset_BattlePyramid;
 extern const struct Tileset gTileset_TrainerHill;
 extern const struct Tileset gTileset_BattleTent;
+
+extern const struct Tileset gTileset_RG_General;
 extern const struct Tileset gTileset_RG_PalletTown;
 extern const struct Tileset gTileset_RG_ViridianCity;
 extern const struct Tileset gTileset_RG_PewterCity;
@@ -63,5 +64,7 @@ extern const struct Tileset gTileset_RG_SeviiIslands123;
 extern const struct Tileset gTileset_RG_SeviiIslands45;
 extern const struct Tileset gTileset_RG_SeviiIslands67;
 extern const struct Tileset gTileset_RG_TrainerTower;
+
+extern const struct Tileset gTileset_Custom_General;
 
 #endif //GUARD_tilesets_H

@@ -31,6 +31,7 @@ void InitTilesetAnim_MauvilleGym(void);
 void InitTilesetAnim_EliteFour(void);
 void InitTilesetAnim_BattleDome(void);
 void InitTilesetAnim_BattlePyramid(void);
+
 void InitTilesetAnim_RG_General(void);
 void InitTilesetAnim_RG_Building(void);
 void InitTilesetAnim_RG_CeladonCity(void);

@@ -60,7 +60,7 @@ struct VsSeekerTrainerInfo
     u8 objectEventId;
     s16 xCoord;
     s16 yCoord;
-    u8 graphicsId;
+    u16 graphicsId;
 };
 
 struct VsSeekerStruct
@@ -89,7 +89,7 @@ static void Task_VsSeeker_ShowResponseToPlayer(u8 taskId);
 static bool8 CanUseVsSeeker(void);
 static u8 GetVsSeekerResponseInArea(void);
 #if FREE_MATCH_CALL == FALSE
-static u8 GetResponseMovementTypeFromTrainerGraphicsId(u8 graphicsId);
+static u8 GetResponseMovementTypeFromTrainerGraphicsId(u16 graphicsId);
 #endif //FREE_MATCH_CALL
 static u16 GetTrainerFlagFromScript(const u8 * script);
 static void ClearAllTrainerRematchStates(void);
@@ -204,11 +204,11 @@ void VsSeekerResetObjectMovementAfterChargeComplete(void)
 
     for (i = 0; i < gMapHeader.events->objectEventCount; i++)
     {
-        if (templates[i].trainerType != TRAINER_TYPE_NORMAL
-        && templates[i].trainerType != TRAINER_TYPE_BURIED)
+        if (templates[i].objUnion.normal.trainerType != TRAINER_TYPE_NORMAL
+        && templates[i].objUnion.normal.trainerType != TRAINER_TYPE_BURIED)
             continue;
 
-        if (templates[i].movementType != MOVEMENT_TYPE_ROTATE_CLOCKWISE)
+        if (templates[i].objUnion.normal.movementType != MOVEMENT_TYPE_ROTATE_CLOCKWISE)
             continue;
 
         movementType = GetRandomFaceDirectionMovementType();
@@ -219,7 +219,7 @@ void VsSeekerResetObjectMovementAfterChargeComplete(void)
             continue;
 
         SetTrainerMovementType(objectEvent, movementType);
-        templates[i].movementType = movementType;
+        templates[i].objUnion.normal.movementType = movementType;
     }
 }
 
@@ -373,7 +373,7 @@ static void GatherNearbyTrainerInfo(void)
 
     for (objectEventIdx = 0; objectEventIdx < gMapHeader.events->objectEventCount; objectEventIdx++)
     {
-        if (templates[objectEventIdx].trainerType != TRAINER_TYPE_NORMAL && templates[objectEventIdx].trainerType != TRAINER_TYPE_BURIED)
+        if (templates[objectEventIdx].objUnion.normal.trainerType != TRAINER_TYPE_NORMAL && templates[objectEventIdx].objUnion.normal.trainerType != TRAINER_TYPE_BURIED)
             continue;
 
         sVsSeeker->trainerInfo[vsSeekerObjectIdx].script = templates[objectEventIdx].script;
@@ -522,8 +522,8 @@ void ClearRematchMovementByTrainerId(void)
 
     for (i = 0; i < gMapHeader.events->objectEventCount; i++)
     {
-        if ((objectEventTemplates[i].trainerType != TRAINER_TYPE_NORMAL
-        && objectEventTemplates[i].trainerType != TRAINER_TYPE_BURIED)
+        if ((objectEventTemplates[i].objUnion.normal.trainerType != TRAINER_TYPE_NORMAL
+        && objectEventTemplates[i].objUnion.normal.trainerType != TRAINER_TYPE_BURIED)
         || vsSeekerDataIdx != TrainerIdToRematchTableId(gRematchTable, GetTrainerFlagFromScript(objectEventTemplates[i].script)))
             continue;
 
@@ -606,7 +606,7 @@ static u8 GetRandomFaceDirectionMovementType()
 }
 
 #if FREE_MATCH_CALL == FALSE
-static bool32 IsRegularLandTrainer(u8 graphicsId)
+static bool32 IsRegularLandTrainer(u16 graphicsId)
 {
     u32 i;
     u16 regularTrainersOnLand[] =
@@ -669,7 +669,7 @@ static bool32 IsRegularLandTrainer(u8 graphicsId)
     return FALSE;
 }
 
-static bool32 IsRegularWaterTrainer(u8 graphicsId)
+static bool32 IsRegularWaterTrainer(u16 graphicsId)
 {
     u32 i;
     u16 regularTrainersInWater[] =
@@ -687,7 +687,7 @@ static bool32 IsRegularWaterTrainer(u8 graphicsId)
     return FALSE;
 }
 
-static u8 GetResponseMovementTypeFromTrainerGraphicsId(u8 graphicsId)
+static u8 GetResponseMovementTypeFromTrainerGraphicsId(u16 graphicsId)
 {
     if (IsRegularLandTrainer(graphicsId) || IsRegularWaterTrainer(graphicsId))
         return MOVEMENT_TYPE_ROTATE_CLOCKWISE;

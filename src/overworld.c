@@ -69,6 +69,7 @@
 #include "constants/weather.h"
 #include "region_map.h"
 #include "field_player_avatar.h"
+#include "constants/event_objects.h"
 
 struct CableClubPlayer
 {
@@ -503,13 +504,29 @@ void ApplyNewEncryptionKeyToGameStats(u32 newKey)
 
 void LoadObjEventTemplatesFromHeader(void)
 {
-    // Clear map object templates
-    CpuFill32(0, gSaveBlock1Ptr->objectEventTemplates, sizeof(gSaveBlock1Ptr->objectEventTemplates));
+    u32 i;
+    for (i = 0; i < gMapHeader.events->objectEventCount; i++)
+    {
+        const struct ObjectEventTemplate *mapHeaderObjTemplate = &gMapHeader.events->objectEvents[i];
+        struct ObjectEventTemplate *savObjTemplate = &gSaveBlock1Ptr->objectEventTemplates[i];
 
-    // Copy map header events to save block
-    CpuCopy32(gMapHeader.events->objectEvents,
-              gSaveBlock1Ptr->objectEventTemplates,
-              gMapHeader.events->objectEventCount * sizeof(struct ObjectEventTemplate));
+        if (mapHeaderObjTemplate->kind == OBJ_KIND_CLONE)
+        {
+            // load target object from the connecting map
+            *savObjTemplate = Overworld_GetMapHeaderByGroupAndId(mapHeaderObjTemplate->objUnion.clone.targetMapGroup, mapHeaderObjTemplate->objUnion.clone.targetMapNum)->events->objectEvents[mapHeaderObjTemplate->objUnion.clone.targetLocalId - 1];
+            savObjTemplate->localId = mapHeaderObjTemplate->localId;
+            savObjTemplate->x = mapHeaderObjTemplate->x;
+            savObjTemplate->y = mapHeaderObjTemplate->y;
+            savObjTemplate->objUnion.clone.targetLocalId = mapHeaderObjTemplate->objUnion.clone.targetLocalId;
+            savObjTemplate->objUnion.clone.targetMapNum = mapHeaderObjTemplate->objUnion.clone.targetMapNum;
+            savObjTemplate->objUnion.clone.targetMapGroup = mapHeaderObjTemplate->objUnion.clone.targetMapGroup;
+            savObjTemplate->kind = OBJ_KIND_CLONE;
+        }
+        else
+        {
+            *savObjTemplate = *mapHeaderObjTemplate;
+        }
+    }
 }
 
 void LoadSaveblockObjEventScripts(void)
@@ -549,7 +566,7 @@ void SetObjEventTemplateMovementType(u8 localId, u8 movementType)
         struct ObjectEventTemplate *objectEventTemplate = &savObjTemplates[i];
         if (objectEventTemplate->localId == localId)
         {
-            objectEventTemplate->movementType = movementType;
+            objectEventTemplate->objUnion.normal.movementType = movementType;
             return;
         }
     }
@@ -1391,7 +1408,8 @@ bool8 IsMapTypeOutdoors(u8 mapType)
      || mapType == MAP_TYPE_TOWN
      || mapType == MAP_TYPE_UNDERWATER
      || mapType == MAP_TYPE_CITY
-     || mapType == MAP_TYPE_OCEAN_ROUTE)
+     || mapType == MAP_TYPE_OCEAN_ROUTE
+     || mapType == MAP_TYPE_OUTDOOR_DUNGEON)
         return TRUE;
     else
         return FALSE;
@@ -2879,7 +2897,7 @@ bool32 Overworld_RecvKeysFromLinkIsRunning(void)
 
     if (temp == TRUE)
         return TRUE;
-    else if (gPaletteFade.active && gPaletteFade.softwareFadeFinishing)
+    else if (gPaletteFade.active && gPaletteFade.softwareFadeFinishingCounter > 0)
         return TRUE;
     else
         return FALSE;

@@ -791,21 +791,20 @@ void FieldEffectScript_LoadTiles(u8 **script)
 void FieldEffectScript_LoadFadedPalette(u8 **script)
 {
     struct SpritePalette *palette = (struct SpritePalette *)FieldEffectScript_ReadWord(script);
-    u8 colorMap, paletteSlot;
+    u8 paletteSlot;
+    (*script) += 4; // TODO: LoadSpritePalette before or after this?
     LoadSpritePalette(palette);
-    (*script) += 4;
     paletteSlot = IndexOfSpritePaletteTag(palette->tag);
-    colorMap = FieldEffectScript_ReadByte(script);
-    (*script) += 1;
-    UpdatePaletteColorMap(paletteSlot, colorMap);
+    UpdatePaletteColorMap(paletteSlot, FieldEffectScript_ReadByte(script));
     UpdateSpritePaletteWithWeather(paletteSlot);
+    (*script)++;
 }
 
 void FieldEffectScript_LoadPalette(u8 **script)
 {
     struct SpritePalette *palette = (struct SpritePalette *)FieldEffectScript_ReadWord(script);
+    (*script) += 4; // TODO: LoadSpritePalette before or after this?
     LoadSpritePalette(palette);
-    (*script) += 4;
 }
 
 void FieldEffectScript_CallNative(u8 **script, u32 *val)

@@ -780,6 +780,14 @@
 #define METATILE_Underwater_FloorShadow  0x228
 #define METATILE_Underwater_RockWall     0x21E
 
+// Other
+#define METATILE_RSMossdeepGym_RedArrow_Down   0x205
+#define METATILE_RSMossdeepGym_RedArrow_Left   0x20C
+#define METATILE_RSMossdeepGym_RedArrow_Right  0x204
+#define METATILE_RSMossdeepGym_RedArrow_Up     0x20D
+#define METATILE_RSMossdeepGym_Switch_Down     0x239
+#define METATILE_RSMossdeepGym_Switch_Up       0x238
+
 // gTileset_RG
 #define METATILE_RG_Building_PC_Off                                         0x062
 #define METATILE_RG_Building_PC_On                                          0x063
@@ -1006,12 +1014,18 @@
 #define METATILE_RG_ViridianForest_HugeTreeTopMiddle_Grass                  0x284
 #define METATILE_RG_ViridianForest_HugeTreeTopMiddle_Mowed                  0x281
 
-// Other
-#define METATILE_RSMossdeepGym_RedArrow_Down   0x205
-#define METATILE_RSMossdeepGym_RedArrow_Left   0x20C
-#define METATILE_RSMossdeepGym_RedArrow_Right  0x204
-#define METATILE_RSMossdeepGym_RedArrow_Up     0x20D
-#define METATILE_RSMossdeepGym_Switch_Down     0x239
-#define METATILE_RSMossdeepGym_Switch_Up       0x238
+// gTileset_Custom
+#define METATILE_Custom_General_CalmWater               0x12B
+#define METATILE_Custom_General_Door                    0x03D
+#define METATILE_Custom_General_Plain_Grass             0x00D
+#define METATILE_Custom_General_Plain_Mowed             0x001
+#define METATILE_Custom_General_SlidingDoubleDoor       0x15B
+#define METATILE_Custom_General_SlidingSingleDoor       0x062
+#define METATILE_Custom_General_ThinTreeTop_Grass       0x00A
+#define METATILE_Custom_General_ThinTreeTop_Mowed       0x013
+#define METATILE_Custom_General_WideTreeTopLeft_Grass   0x00B
+#define METATILE_Custom_General_WideTreeTopLeft_Mowed   0x00E
+#define METATILE_Custom_General_WideTreeTopRight_Grass  0x00C
+#define METATILE_Custom_General_WideTreeTopRight_Mowed  0x00F
 
 #endif // GUARD_METATILE_LABELS_H

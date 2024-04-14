@@ -238,7 +238,7 @@ gFieldEffectScript_PokeballTrail::
 	field_eff_end
 
 gFieldEffectScript_HeartIcon::
-	field_eff_loadfadedpal_callnative gSpritePalette_GeneralFieldEffect0, COLOR_MAP_NONE, FldEff_HeartIcon
+	field_eff_loadfadedpal_callnative gSpritePalette_ArrowEmotionsFieldEffect, COLOR_MAP_NONE, FldEff_HeartIcon
 	field_eff_end
 
 gFieldEffectScript_AshPuff::
@@ -262,7 +262,7 @@ gFieldEffectScript_Bubbles::
 	field_eff_end
 
 gFieldEffectScript_Sparkle::
-	field_eff_loadfadedpal_callnative gSpritePalette_GeneralFieldEffect3, COLOR_MAP_DARK_CONTRAST, FldEff_Sparkle
+	field_eff_callnative FldEff_Sparkle
 	field_eff_end
 
 gFieldEffectScript_ShowSecretPowerCave::

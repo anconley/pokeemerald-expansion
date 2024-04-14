@@ -9,7 +9,7 @@ static u32 GetItemBallIdFromTemplate(u32);
 
 static u32 GetItemBallAmountFromTemplate(u32 itemBallId)
 {
-    u32 amount = gMapHeader.events->objectEvents[itemBallId].movementRangeX;
+    u32 amount = gMapHeader.events->objectEvents[itemBallId].objUnion.normal.movementRangeX;
 
     if (amount > MAX_BAG_ITEM_CAPACITY)
         return MAX_BAG_ITEM_CAPACITY;
@@ -19,7 +19,7 @@ static u32 GetItemBallAmountFromTemplate(u32 itemBallId)
 
 static u32 GetItemBallIdFromTemplate(u32 itemBallId)
 {
-    u32 itemId = gMapHeader.events->objectEvents[itemBallId].trainerRange_berryTreeId;
+    u32 itemId = gMapHeader.events->objectEvents[itemBallId].objUnion.normal.trainerRange_berryTreeId;
 
     return (itemId >= ITEMS_COUNT) ? (ITEM_NONE + 1) : itemId;
 }

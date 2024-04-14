@@ -25,10 +25,11 @@
 	.byte 4
 	.endm
 
-	.macro field_eff_loadgfx_callnative tiles_address:req, palette_address:req, function_address:req
+	.macro field_eff_loadgfx_callnative tiles_address:req, palette_address:req, colorMap:req, function_address:req
 	.byte 5
 	.4byte \tiles_address
 	.4byte \palette_address
+	.byte \colorMap
 	.4byte \function_address
 	.endm
 
