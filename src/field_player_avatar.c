@@ -32,6 +32,7 @@
 #include "field_control_avatar.h"
 #include "constants/metatile_behaviors.h"
 #include "m4a.h"
+#include "link.h"
 
 #define NUM_ACRO_BIKE_COLLISIONS 5
 
@@ -232,18 +233,6 @@ static const u16 sPlayerAvatarAnimGfxIds[][2] =
     [PLAYER_AVATAR_GFX_FIELD_MOVE] = {OBJ_EVENT_GFX_BRENDAN_FIELD_MOVE, OBJ_EVENT_GFX_MAY_FIELD_MOVE},
     [PLAYER_AVATAR_GFX_FISHING]    = {OBJ_EVENT_GFX_BRENDAN_FISHING,    OBJ_EVENT_GFX_MAY_FISHING},
     [PLAYER_AVATAR_GFX_WATERING]   = {OBJ_EVENT_GFX_BRENDAN_WATERING,   OBJ_EVENT_GFX_MAY_WATERING},
-};
-
-static const u16 sFRLGAvatarGfxIds[GENDER_COUNT] =
-{
-    [MALE]   = OBJ_EVENT_GFX_RG_RED_NORMAL,
-    [FEMALE] = OBJ_EVENT_GFX_RG_LEAF_NORMAL
-};
-
-static const u16 sRSAvatarGfxIds[GENDER_COUNT] =
-{
-    [MALE]   = OBJ_EVENT_GFX_LINK_RS_BRENDAN,
-    [FEMALE] = OBJ_EVENT_GFX_LINK_RS_MAY
 };
 
 static const u16 sPlayerAvatarGfxToStateFlag[4] =
@@ -1241,14 +1230,19 @@ u16 GetPlayerAvatarGraphicsIdByStateIdAndGender(u8 state, u8 gender)
     return sPlayerAvatarGfxIds[state][gender];
 }
 
-u16 GetFRLGAvatarGraphicsIdByGender(u8 gender)
+u8 GetLinkPlayerAvatarGraphicsIdByGender(u8 version, u8 gender)
 {
-    return sFRLGAvatarGfxIds[gender];
-}
-
-u16 GetRSAvatarGraphicsIdByGender(u8 gender)
-{
-    return sRSAvatarGfxIds[gender];
+    u8 gfxId = sPlayerAvatarGfxIds[PLAYER_AVATAR_STATE_NORMAL][gender];
+    switch (GetVersionId(version))
+    {
+    case 2:
+        gfxId = OBJ_EVENT_GFX_RG_RED_NORMAL + gender;
+        break;
+    case 1:
+        gfxId = OBJ_EVENT_GFX_LINK_RS_BRENDAN + gender;
+        break;
+    }
+    return gfxId;
 }
 
 u16 GetPlayerAvatarGraphicsIdByStateId(u8 state)

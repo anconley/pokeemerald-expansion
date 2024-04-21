@@ -344,5 +344,8 @@ bool8 DoesLinkPlayerCountMatchSaved(void);
 void SetCloseLinkCallbackAndType(u16 type);
 bool32 IsSendingKeysToLink(void);
 u32 GetLinkRecvQueueLength(void);
+u32 GetVersionId(u8 version);
+u32 GetLinkPlayerFrontTrainerPicId(u8 multiplayerId);
+u32 GetLinkPlayerBackTrainerPicId(u8 multiplayerId);
 
 #endif // GUARD_LINK_H

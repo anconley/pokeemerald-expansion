@@ -57,6 +57,7 @@
 #include "constants/union_room.h"
 #include "region_map.h"
 #include "constants/weather.h"
+#include "trainer_pokemon_sprites.h"
 
 #define FRIENDSHIP_EVO_THRESHOLD ((P_FRIENDSHIP_EVO_THRESHOLD >= GEN_9) ? 160 : 220)
 
@@ -4790,7 +4791,7 @@ s32 GetBattlerMultiplayerId(u16 id)
 u8 GetTrainerEncounterMusicId(u16 trainerOpponentId)
 {
     if (InBattlePyramid())
-        return GetTrainerEncounterMusicIdInBattlePyramid(trainerOpponentId);
+        return GetFacilityClassEncounterMusicId(gFacilityTrainers[trainerOpponentId].facilityClass);
     else if (InTrainerHillChallenge())
         return GetTrainerEncounterMusicIdInTrainerHill(trainerOpponentId);
     else
@@ -5939,10 +5940,7 @@ u16 FacilityClassToPicIndex(u16 facilityClass)
 
 u16 PlayerGenderToFrontTrainerPicId(u8 playerGender)
 {
-    if (playerGender != MALE)
-        return FacilityClassToPicIndex(FACILITY_CLASS_MAY);
-    else
-        return FacilityClassToPicIndex(FACILITY_CLASS_BRENDAN);
+    return GetPlayerFrontTrainerPicId(GAME_VERSION, playerGender);
 }
 
 void HandleSetPokedexFlag(u16 nationalNum, u8 caseId, u32 personality)
@@ -6581,4 +6579,9 @@ u16 GetSpeciesPreEvolution(u16 species)
 const u8 *GetMoveName(u16 moveId)
 {
     return gMovesInfo[moveId].name;
+}
+
+u8 PlayerGenderToBackTrainerPicId(u8 playerGender)
+{
+    return GetPlayerBackTrainerPicId(GAME_VERSION, playerGender);
 }

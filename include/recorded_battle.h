@@ -72,7 +72,7 @@ void PlayRecordedBattle(void (*CB2_After)(void));
 u8 GetRecordedBattleFrontierFacility(void);
 u8 GetRecordedBattleFronterBrainSymbol(void);
 void RecordedBattle_SaveParties(void);
-u8 GetBattlerLinkPlayerGender(u32 battler);
+u32 GetActiveBattlerLinkPlayerId(u32 battler);
 void RecordedBattle_ClearFrontierPassFlag(void);
 void RecordedBattle_SetFrontierPassFlagFromHword(u16 flags);
 u8 RecordedBattle_GetFrontierPassFlag(void);

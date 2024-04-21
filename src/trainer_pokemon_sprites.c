@@ -8,6 +8,7 @@
 #include "data.h"
 #include "pokemon.h"
 #include "constants/trainers.h"
+#include "link.h"
 
 #define PICS_COUNT 8
 
@@ -349,6 +350,35 @@ u16 PlayerGenderToFrontTrainerPicId_Debug(u8 gender, bool8 getClass)
             return gFacilityClassToPicIndex[FACILITY_CLASS_MAY];
         else
             return gFacilityClassToPicIndex[FACILITY_CLASS_BRENDAN];
+    }
+    return gender;
+}
+
+u32 GetPlayerFrontTrainerPicId(u8 version, u8 gender)
+{
+    u16 trainerPicId = TRAINER_PIC_BRENDAN;
+    switch (GetVersionId(version))
+    {
+    case 1:
+        trainerPicId = TRAINER_PIC_RS_BRENDAN;
+        break;
+    case 2:
+        trainerPicId = TRAINER_PIC_RG_RED;
+        break;
+    }
+    return trainerPicId + gender;
+}
+
+u32 GetPlayerBackTrainerPicId(u8 version, u8 gender)
+{
+    switch (GetVersionId(version))
+    {
+    case 1:
+        gender += TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN;
+        break;
+    case 2:
+        gender += TRAINER_BACK_PIC_RG_RED;
+        break;
     }
     return gender;
 }

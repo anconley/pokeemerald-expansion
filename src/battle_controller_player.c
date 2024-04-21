@@ -1833,31 +1833,12 @@ static void PlayerHandleSwitchInAnim(u32 battler)
     BtlController_HandleSwitchInAnim(battler, TRUE, SwitchIn_TryShinyAnimShowHealthbox);
 }
 
-u32 LinkPlayerGetTrainerPicId(u32 multiplayerId)
-{
-    u32 trainerPicId;
-
-    u8 gender = gLinkPlayers[multiplayerId].gender;
-    u8 version = gLinkPlayers[multiplayerId].version & 0xFF;
-
-    if (version == VERSION_FIRE_RED || version == VERSION_LEAF_GREEN)
-        trainerPicId = gender + TRAINER_BACK_PIC_RG_RED;
-    else if (version == VERSION_RUBY || version == VERSION_SAPPHIRE)
-        trainerPicId = gender + TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN;
-    else
-        trainerPicId = gender + TRAINER_BACK_PIC_BRENDAN;
-
-    return trainerPicId;
-}
-
 static u32 PlayerGetTrainerBackPicId(void)
 {
-    u32 trainerPicId;
+    u32 trainerPicId = PlayerGenderToBackTrainerPicId(gSaveBlock2Ptr->playerGender);;
 
     if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-        trainerPicId = LinkPlayerGetTrainerPicId(GetMultiplayerId());
-    else
-        trainerPicId = gSaveBlock2Ptr->playerGender + TRAINER_BACK_PIC_BRENDAN;
+        trainerPicId = GetLinkPlayerBackTrainerPicId(GetMultiplayerId());
 
     return trainerPicId;
 }
@@ -2236,7 +2217,7 @@ static void PlayerHandleOneReturnValue_Duplicate(u32 battler)
 
 static void PlayerHandleIntroTrainerBallThrow(u32 battler)
 {
-    const u32 *trainerPal = gTrainerBacksprites[gSaveBlock2Ptr->playerGender].palette.data;
+    const u32 *trainerPal = gTrainerBacksprites[PlayerGenderToBackTrainerPicId(gSaveBlock2Ptr->playerGender)].palette.data;
     BtlController_HandleIntroTrainerBallThrow(battler, 0xD6F8, trainerPal, 31, Intro_TryShinyAnimShowHealthbox);
 }
 

@@ -620,7 +620,7 @@ static void RecordedBattle_RestoreSavedParties(void)
     }
 }
 
-u8 GetBattlerLinkPlayerGender(u32 battler)
+u32 GetActiveBattlerLinkPlayerId(u32 battler)
 {
     s32 i;
 
@@ -631,7 +631,7 @@ u8 GetBattlerLinkPlayerGender(u32 battler)
     }
 
     if (i != MAX_LINK_PLAYERS)
-        return gLinkPlayers[i].gender;
+        return i;
 
     return 0;
 }
